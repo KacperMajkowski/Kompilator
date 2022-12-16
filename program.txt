@@ -1,8 +1,8 @@
 PROGRAM IS
-VAR X, Y
+VAR X, Y, Z
 BEGIN
     READ X;
-    WRITE X;
     READ Y;
-    WRITE Y;
+    Z := X + Y;
+    WRITE Z;
 END

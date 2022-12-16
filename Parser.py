@@ -55,6 +55,11 @@ class CompParser(Parser):
     def command(self, p):
         print("Put variable with index", p[1])
         self.out += "PUT " + str(p[1]) + "\n"
+
+    @_("identifier ASSIGN expression semi")
+    def command(self, p):
+        print("Assign", self.variables[0][0], "to", p[0])
+        self.out += "STORE " + str(self.getVarCellIndex(p[0])) + "\n"
         
     @_("identifier")
     def value(self, p):
@@ -64,10 +69,25 @@ class CompParser(Parser):
     def value(self, p):
         self.out += "SET " + str(p[0]) + "\n"
         return 0
+    
+    @_("value")
+    def expression(self, p):
+        pass
+
+    @_("value PLUS value")
+    def expression(self, p):
+        self.out += "LOAD " + str(p[0]) + "\n"
+        self.setAcc(str(p[0]))
+        self.out += "ADD " + str(p[2]) + "\n"
+        pass
 
     def error(self, p):
         print("Error in line", p.lineno)
         
+    #Ustaw akumulator
+    def setAcc(self, x):
+        self.variables[0][0] = x
+    
     #Zwraca indeks zmiennej w pamięci
     def getVarCellIndex(self, x):
         for cellIndex in range(len(self.variables)):
