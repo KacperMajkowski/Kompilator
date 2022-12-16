@@ -6,6 +6,7 @@ class CompParser(Parser):
     
     tokens = CompLexer.tokens
     nextFreeIndex = 1
+    tempIndexes = 0
     currContext = 0     #0 - main, następne dla kolejnych funkcji
     
     contexts = ["main"]
@@ -29,11 +30,13 @@ class CompParser(Parser):
     def declarations(self, p):
         print("Declare variable", p[1])
         self.variables.append([self.currContext, p[1]])
+        self.nextFreeIndex += 1
         
     @_("identifier")
     def declarations(self, p):
         print("Declare variable", p[0])
         self.variables.append([self.currContext, p[0]])
+        self.nextFreeIndex += 1
         
     @_("commands command")
     def commands(self, p):
@@ -49,7 +52,6 @@ class CompParser(Parser):
         if self.getVarCellIndex(p[1]) is None:
             print("Błąd w lini", p.lineno, ": Nie znaleziono zmiennej", p[1])
         self.out += "GET " + str(self.getVarCellIndex(p[1])) + "\n"
-        self.nextFreeIndex += 1
 
     @_("WRITE value semi")
     def command(self, p):
@@ -68,17 +70,20 @@ class CompParser(Parser):
     @_("num")
     def value(self, p):
         self.out += "SET " + str(p[0]) + "\n"
-        return 0
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.tempIndexes += 1
+        return self.nextFreeIndex + self.tempIndexes - 1
     
     @_("value")
     def expression(self, p):
-        pass
+        self.tempIndexes = 0
 
     @_("value PLUS value")
     def expression(self, p):
         self.out += "LOAD " + str(p[0]) + "\n"
         self.setAcc(str(p[0]))
         self.out += "ADD " + str(p[2]) + "\n"
+        self.tempIndexes = 0
         pass
 
     def error(self, p):

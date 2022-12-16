@@ -4,5 +4,6 @@ BEGIN
     READ X;
     READ Y;
     Z := X + Y;
+    Z := 5;
     WRITE Z;
 END
