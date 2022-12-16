@@ -20,6 +20,10 @@ class CompParser(Parser):
     @_("PROGRAM_IS VAR declarations BEGIN commands END")
     def main(self, p):
         pass
+
+    @_("PROGRAM_IS BEGIN commands END")
+    def main(self, p):
+        pass
     
     @_("declarations identifier")
     def declarations(self, p):
