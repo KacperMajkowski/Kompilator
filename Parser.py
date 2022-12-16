@@ -47,7 +47,7 @@ class CompParser(Parser):
     @_("WRITE value")
     def command(self, p):
         print("Put variable with index", p[1])
-        self.out += "PUT" + str(p[1]) + "\n"
+        self.out += "PUT " + str(p[1]) + "\n"
         
     @_("identifier")
     def value(self, p):
@@ -55,7 +55,7 @@ class CompParser(Parser):
 
     @_("num")
     def value(self, p):
-        self.out += "SET" + str(p[0]) + "\n"
+        self.out += "SET " + str(p[0]) + "\n"
         return 0
 
     def error(self, t):
