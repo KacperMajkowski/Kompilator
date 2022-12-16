@@ -7,14 +7,17 @@ class CompLexer(Lexer):
     ignore = ' \t'
     ignore_comma = ','
     ignore_comment = r'\[.*\]'
-    ignore_newline = r'\n+'
+
+    @_(r'\n+')
+    def newline(self, t):
+        self.lineno += t.value.count('\n')
     
     num = r'\d+'
     semi = r';'
-    READ = r'READ'
-    WRITE = r'WRITE'
+    READ = r'READ '
+    WRITE = r'WRITE '
     PROGRAM_IS = r'PROGRAM IS'
-    VAR = r'VAR'
+    VAR = r'VAR '
     BEGIN = r'BEGIN'
     END = r'END'
     
@@ -26,5 +29,4 @@ if __name__ == '__main__':
     lexer = CompLexer()
     for tok in lexer.tokenize(data):
         print(tok)
-        print('type=%r, value=%r' % (tok.type, tok.value))
         

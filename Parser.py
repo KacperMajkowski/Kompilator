@@ -62,13 +62,8 @@ class CompParser(Parser):
         return 0
 
     def error(self, p):
-        if p:
-            print("Syntax error at token", p.type)
-            # Just discard the token and tell the parser it's okay.
-            self.errok()
-        else:
-            print("Syntax error at EOF")
-
+        print("Error in line", p.lineno)
+        
     #Zwraca indeks zmiennej w pamięci
     def getVarCellIndex(self, x):
         for cellIndex in range(len(self.variables)):
