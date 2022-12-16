@@ -39,7 +39,7 @@ class CompParser(Parser):
     def commands(self, p):
         pass
         
-    @_("READ identifier")
+    @_("READ identifier semi")
     def command(self, p):
         print("Read input to variable", p[1], "on index", self.getVarCellIndex(p[1]))
         if self.getVarCellIndex(p[1]) is None:
@@ -47,7 +47,7 @@ class CompParser(Parser):
         self.out += "GET " + str(self.getVarCellIndex(p[1])) + "\n"
         self.nextFreeIndex += 1
 
-    @_("WRITE value")
+    @_("WRITE value semi")
     def command(self, p):
         print("Put variable with index", p[1])
         self.out += "PUT " + str(p[1]) + "\n"
@@ -62,10 +62,12 @@ class CompParser(Parser):
         return 0
 
     def error(self, p):
-        print("Whoa. You are seriously hosed.")
-        if not p:
-            print("End of File!")
-            return
+        if p:
+            print("Syntax error at token", p.type)
+            # Just discard the token and tell the parser it's okay.
+            self.errok()
+        else:
+            print("Syntax error at EOF")
 
     #Zwraca indeks zmiennej w pamięci
     def getVarCellIndex(self, x):

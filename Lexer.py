@@ -2,15 +2,15 @@ from sly import Lexer
 
 
 class CompLexer(Lexer):
-    tokens = {"identifier", "num", "READ", "WRITE", "PROGRAM_IS", "VAR", "BEGIN", "END"}
+    tokens = {"identifier", "num", "semi", "READ", "WRITE", "PROGRAM_IS", "VAR", "BEGIN", "END"}
     
     ignore = ' \t'
-    ignore_semicolon = ';'
     ignore_comma = ','
     ignore_comment = r'\[.*\]'
     ignore_newline = r'\n+'
     
     num = r'\d+'
+    semi = r';'
     READ = r'READ'
     WRITE = r'WRITE'
     PROGRAM_IS = r'PROGRAM IS'
