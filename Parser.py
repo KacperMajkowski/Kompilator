@@ -41,7 +41,10 @@ class CompParser(Parser):
         
     @_("READ identifier")
     def command(self, p):
-        print("Read variable", p[1], "to cell", self.nextFreeIndex)
+        print("Read input to variable", p[1], "on index", self.getVarCellIndex(p[1]))
+        if self.getVarCellIndex(p[1]) is None:
+            print("Błąd w lini", p.lineno, ": Nie znaleziono zmiennej", p[1])
+        self.out += "GET " + str(self.getVarCellIndex(p[1])) + "\n"
         self.nextFreeIndex += 1
 
     @_("WRITE value")
@@ -51,35 +54,36 @@ class CompParser(Parser):
         
     @_("identifier")
     def value(self, p):
-        return getVarCellIndex(self.variables, self.currContext, p[0])
+        return self.getVarCellIndex(p[0])
 
     @_("num")
     def value(self, p):
         self.out += "SET " + str(p[0]) + "\n"
         return 0
 
-    def error(self, t):
-        print("Illegal character '%s'" % t)
+    def error(self, p):
+        print("Whoa. You are seriously hosed.")
+        if not p:
+            print("End of File!")
+            return
 
-
-def getFuncContext(f, functions):
-    return functions.index(f)
-
-
-def getVarCellIndex(variables, currContext, x):
-    for cellIndex in range(len(variables)):
-        if currContext == variables[cellIndex][0] and x == variables[cellIndex][1]:
-            return cellIndex
-    print(variables, currContext, x, "not found")
+    #Zwraca indeks zmiennej w pamięci
+    def getVarCellIndex(self, x):
+        for cellIndex in range(len(self.variables)):
+            if self.currContext == self.variables[cellIndex][0] and x == self.variables[cellIndex][1]:
+                return cellIndex
+        print(self.variables, self.currContext, x, "not found")
   
-  
+   
 if __name__ == '__main__':
     lexer = CompLexer()
     parser = CompParser()
 
     text = open("program.txt").read()
     result = parser.parse(lexer.tokenize(text))
+    code = parser.out
+    code += "HALT\n"
     print(" ")
-    print(parser.out)
+    print(code)
     #print(parser.variables)
     

@@ -25,5 +25,6 @@ if __name__ == '__main__':
     data = open("program.txt").read()
     lexer = CompLexer()
     for tok in lexer.tokenize(data):
+        print(tok)
         print('type=%r, value=%r' % (tok.type, tok.value))
         

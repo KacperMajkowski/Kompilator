@@ -1,10 +1,8 @@
 PROGRAM IS
 VAR X, Y
 BEGIN
-    WRITE 8 [Wypisz 8]
     READ X
-
-    [Wczytaj Y]
+    WRITE X
     READ Y
     WRITE Y
 END
