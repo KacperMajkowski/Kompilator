@@ -2,7 +2,7 @@ from sly import Lexer
 
 
 class CompLexer(Lexer):
-    tokens = {"identifier", "num", "semi", "READ", "WRITE", "PROGRAM_IS", "VAR", "BEGIN", "END", "ASSIGN", "PLUS"}
+    tokens = {"identifier", "num", "semi", "READ", "WRITE", "PROGRAM_IS", "VAR", "BEGIN", "END", "ASSIGN", "PLUS", "MINUS"}
     
     ignore = ' \t'
     ignore_comma = ','
@@ -22,6 +22,7 @@ class CompLexer(Lexer):
     END = r'END'
     ASSIGN = r':='
     PLUS = r'\+'
+    MINUS = r'\-'
     
     identifier = r'[a-zA-Z_][a-zA-Z0-9_]*'
     

@@ -45,7 +45,8 @@ class CompParser(Parser):
     @_("command")
     def commands(self, p):
         pass
-        
+
+    # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
     @_("READ identifier semi")
     def command(self, p):
         print("Read input to variable", p[1], "on index", self.getVarCellIndex(p[1]))
@@ -62,7 +63,9 @@ class CompParser(Parser):
     def command(self, p):
         print("Assign acc to", p[0])
         self.out += "STORE " + str(self.getVarCellIndex(p[0])) + "\n"
-        
+    # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
+
+    # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE
     @_("identifier")        #Value zwraca indeks w pamięci
     def value(self, p):
         return self.getVarCellIndex(p[0])
@@ -74,14 +77,16 @@ class CompParser(Parser):
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
         self.tempIndexes += 1
         return self.nextFreeIndex + self.tempIndexes - 1
+    # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE
     
-    @_("value")             #Expresion ustawia akumulator na wynik
+    # EXPRESSION  # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION
+    @_("value")             #Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
         self.tempIndexes = 0
         self.out += "LOAD " + str(p[0]) + "\n"
         return p[0]
 
-    @_("value PLUS value")  #Expresion ustawia akumulator na wynik
+    @_("value PLUS value")  #Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
         self.out += "LOAD " + str(p[0]) + "\n"
         self.setAcc(str(p[0]))
@@ -90,6 +95,16 @@ class CompParser(Parser):
         self.tempIndexes = 0
         pass
 
+    @_("value MINUS value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
+    def expression(self, p):
+        self.out += "LOAD " + str(p[0]) + "\n"
+        self.setAcc(str(p[0]))
+        self.out += "SUB " + str(p[2]) + "\n"
+        self.setAcc(str(p[0]) + str(p[2]))
+        self.tempIndexes = 0
+        pass
+    # EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION
+    
     def error(self, p):
         print("Error in line", p.lineno)
         
