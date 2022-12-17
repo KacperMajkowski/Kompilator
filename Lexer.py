@@ -5,7 +5,9 @@ class CompLexer(Lexer):
     tokens = {"identifier", "num", "semi",
               "PROGRAM_IS", "VAR", "BEGIN", "END",
               "READ", "WRITE", "ASSIGN",
-              "PLUS", "MINUS", "MUL", "DIV", "MOD"}
+              "PLUS", "MINUS", "MUL", "DIV", "MOD",
+              "EQ",
+              "IF", "THEN", "ENDIF"}
     
     ignore = ' \t'
     ignore_comma = ','
@@ -22,13 +24,17 @@ class CompLexer(Lexer):
     PROGRAM_IS = r'PROGRAM IS'
     VAR = r'VAR '
     BEGIN = r'BEGIN'
-    END = r'END'
     ASSIGN = r':='
     PLUS = r'\+'
     MINUS = r'\-'
     MUL = r'\*'
     DIV = r'\/'
     MOD = r'\%'
+    EQ = r'\='
+    ENDIF = r'ENDIF'
+    IF = 'IF'
+    THEN = 'THEN'
+    END = r'END'
     
     identifier = r'[a-zA-Z_][a-zA-Z0-9_]*'
     

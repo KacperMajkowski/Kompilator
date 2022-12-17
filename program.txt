@@ -1,8 +1,9 @@
 PROGRAM IS
-VAR X, Y, Z
+VAR X
 BEGIN
     READ X;
-    READ Y;
-    Z := X%Y;
-    WRITE Z;
+    IF X = 4
+    THEN
+        WRITE X;
+    ENDIF
 END

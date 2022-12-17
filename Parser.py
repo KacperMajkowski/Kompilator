@@ -64,6 +64,10 @@ class CompParser(Parser):
     def command(self, p):
         print("Assign acc to", p[0])
         self.out += "STORE " + str(self.getVarCellIndex(p[0])) + "\n"
+
+    @_("IF condition THEN commands ENDIF")
+    def command(self, p):
+        self.out += "IF CONDITION\n"
     # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
 
     # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE
@@ -194,6 +198,7 @@ class CompParser(Parser):
     
         self.tempIndexes = 0
         pass
+        
     # EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION
 
     # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
@@ -208,7 +213,7 @@ class CompParser(Parser):
     # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
     
     def error(self, p):
-        print("Error in line", p.lineno)
+        print("Error in line", p.lineno, ": ", str(p))
     
     # Zwraca indeks zmiennej w pamięci
     def getVarCellIndex(self, x):
