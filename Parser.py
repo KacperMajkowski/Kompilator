@@ -14,6 +14,8 @@ class CompParser(Parser):
     
     k = 0
     out = ""
+    program = ""
+    k_correction = 0
 
     @_("main")
     def program_all(self, p):
@@ -21,10 +23,12 @@ class CompParser(Parser):
     
     @_("PROGRAM_IS VAR declarations BEGIN commands END")
     def main(self, p):
+        self.program = p[4]
         pass
 
     @_("PROGRAM_IS BEGIN commands END")
     def main(self, p):
+        self.program = p[2]
         pass
     
     @_("declarations identifier")
@@ -39,31 +43,53 @@ class CompParser(Parser):
         self.variables.append([self.currContext, p[0]])
         self.nextFreeIndex += 1
         
-    @_("commands command")
+    @_("commands command")  # Zwraca kod commands
     def commands(self, p):
-        pass
+        return p[0] + p[1]
 
-    @_("command")
+    @_("command")           # Zwraca kod commands
     def commands(self, p):
-        pass
+        return p[0]
 
     # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
-    @_("READ identifier semi")
+    @_("READ identifier semi") # Zwraca swój kod
     def command(self, p):
         print("Read input to variable", p[1], "on index", self.getVarCellIndex(p[1]))
         if self.getVarCellIndex(p[1]) is None:
             print("Błąd w lini", p.lineno, ": Nie znaleziono zmiennej", p[1])
         self.out += "GET " + str(self.getVarCellIndex(p[1])) + "\n"
+        command = self.out
+        self.k_correction += self.getCurrK()
+        self.out = ""
+        return command
 
-    @_("WRITE value semi")
+    @_("WRITE value semi") # Zwraca swój kod
     def command(self, p):
         print("Put variable with index", p[1])
         self.out += "PUT " + str(p[1]) + "\n"
+        command = self.out
+        self.k_correction += self.getCurrK()
+        self.out = ""
+        return command
 
-    @_("identifier ASSIGN expression semi")
+    @_("identifier ASSIGN expression semi") # Zwraca swój kod
     def command(self, p):
         print("Assign acc to", p[0])
         self.out += "STORE " + str(self.getVarCellIndex(p[0])) + "\n"
+        command = self.out
+        self.k_correction += self.getCurrK()
+        self.out = ""
+        return command
+    
+    @_("IF condition THEN commands ENDIF")
+    def command(self, p):
+        print("SELFOUT: " + str(p[3]) + "SELFOUT\n")
+        self.out += "JPOS " + str(self.getK()) + "\n"
+        command = self.out
+        self.k_correction += self.getCurrK()
+        self.out = ""
+        return command
+        
     # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
 
     # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE
@@ -91,14 +117,14 @@ class CompParser(Parser):
         self.out += "LOAD " + str(p[0]) + "\n"
         self.out += "ADD " + str(p[2]) + "\n"
         self.tempIndexes = 0
-        pass
+
 
     @_("value MINUS value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
         self.out += "LOAD " + str(p[0]) + "\n"
         self.out += "SUB " + str(p[2]) + "\n"
         self.tempIndexes = 0
-        pass
+
 
     @_("value MUL value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
@@ -124,7 +150,7 @@ class CompParser(Parser):
         self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"         # Załaduj tX jako wynik
         
         self.tempIndexes = 0
-        pass
+
 
     @_("value DIV value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
@@ -163,7 +189,6 @@ class CompParser(Parser):
         self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
         
         self.tempIndexes = 0
-        pass
 
     @_("value MOD value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
@@ -193,8 +218,19 @@ class CompParser(Parser):
         self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
     
         self.tempIndexes = 0
-        pass
+
     # EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION
+    
+    # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
+    @_("value EQ value") # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz
+    def condition(self, p):
+        self.out += "LOAD " + str(p[0]) + "\n"
+        self.out += "SUB " + str(p[2]) + "\n"
+        self.out += "JPOS " + str(self.getK() + 4) + "\n"
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "SUB " + str(p[0]) + "\n"
+    
+    # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
     
     def error(self, p):
         print("Error in line", p.lineno)
@@ -205,10 +241,15 @@ class CompParser(Parser):
             if self.currContext == self.variables[cellIndex][0] and x == self.variables[cellIndex][1]:
                 return cellIndex
         print(self.variables, self.currContext, x, "not found")
+
+    # Zwraca linię w obecnej command
+    def getCurrK(self):
+        return self.out.count("\n")
         
-    # Zwraca indeks zmiennej w pamięci
+    # Zwraca linię całego programu
     def getK(self):
-        return self.out.count("\n") - 1
+        #       Długość programu           Długość command      Długość poprzednich command w commands
+        return self.program.count("\n") + self.out.count("\n") + self.k_correction - 1
   
    
 if __name__ == '__main__':
@@ -217,10 +258,10 @@ if __name__ == '__main__':
 
     text = open("program.txt").read()
     result = parser.parse(lexer.tokenize(text))
-    code = parser.out
+    parser.program += parser.out
+    code = parser.program
     code += "HALT\n"
     print(" ")
     print(code)
-    print(parser.getK())
     #print(parser.variables)
     
