@@ -1,9 +1,12 @@
 PROGRAM IS
 VAR X, Y, Z
 BEGIN
-    READ X;
-    READ Y;
-    X := Y;
+    X := 3 + 4;
+    Y := 5;
+    X := Y + 2;
     Z := X + Y;
+    Y := Z;
+    WRITE X;
+    WRITE Y;
     WRITE Z;
 END
