@@ -3,6 +3,7 @@ VAR X, Y, Z
 BEGIN
     READ X;
     READ Y;
+    X := Y;
     Z := X + Y;
     WRITE Z;
 END

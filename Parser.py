@@ -60,29 +60,33 @@ class CompParser(Parser):
 
     @_("identifier ASSIGN expression semi")
     def command(self, p):
-        print("Assign", self.variables[0][0], "to", p[0])
+        print("Assign acc to", p[0])
         self.out += "STORE " + str(self.getVarCellIndex(p[0])) + "\n"
         
-    @_("identifier")
+    @_("identifier")        #Value zwraca indeks w pamięci
     def value(self, p):
         return self.getVarCellIndex(p[0])
 
     @_("num")
-    def value(self, p):
+    def value(self, p):     #Value zwraca indeks w pamięci
         self.out += "SET " + str(p[0]) + "\n"
+        self.setAcc(str(p[0]))
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
         self.tempIndexes += 1
         return self.nextFreeIndex + self.tempIndexes - 1
     
-    @_("value")
+    @_("value")             #Expresion ustawia akumulator na wynik
     def expression(self, p):
         self.tempIndexes = 0
+        self.out += "LOAD " + str(p[0]) + "\n"
+        return p[0]
 
-    @_("value PLUS value")
+    @_("value PLUS value")  #Expresion ustawia akumulator na wynik
     def expression(self, p):
         self.out += "LOAD " + str(p[0]) + "\n"
         self.setAcc(str(p[0]))
         self.out += "ADD " + str(p[2]) + "\n"
+        self.setAcc(str(p[0]) + str(p[2]))
         self.tempIndexes = 0
         pass
 
