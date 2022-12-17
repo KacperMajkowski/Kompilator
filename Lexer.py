@@ -2,7 +2,10 @@ from sly import Lexer
 
 
 class CompLexer(Lexer):
-    tokens = {"identifier", "num", "semi", "READ", "WRITE", "PROGRAM_IS", "VAR", "BEGIN", "END", "ASSIGN", "PLUS", "MINUS"}
+    tokens = {"identifier", "num", "semi",
+              "PROGRAM_IS", "VAR", "BEGIN", "END",
+              "READ", "WRITE", "ASSIGN",
+              "PLUS", "MINUS"}
     
     ignore = ' \t'
     ignore_comma = ','
