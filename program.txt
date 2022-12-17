@@ -1,8 +1,8 @@
 PROGRAM IS
 VAR X, Y, Z
 BEGIN
-    X := 3+4;
-    Y := 5;
-    Z := X-X;
+    READ X;
+    READ Y;
+    Z := X%Y;
     WRITE Z;
 END
