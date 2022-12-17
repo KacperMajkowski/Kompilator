@@ -195,6 +195,17 @@ class CompParser(Parser):
         self.tempIndexes = 0
         pass
     # EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION
+
+    # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
+    @_("value EQ value")  # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz
+    def condition(self, p):
+        self.out += "LOAD " + str(p[0]) + "\n"
+        self.out += "SUB " + str(p[2]) + "\n"
+        self.out += "JPOS " + str(self.getK() + 4) + "\n"
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "SUB " + str(p[0]) + "\n"
+
+    # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
     
     def error(self, p):
         print("Error in line", p.lineno)
