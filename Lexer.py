@@ -7,7 +7,7 @@ class CompLexer(Lexer):
               "READ", "WRITE", "ASSIGN",
               "PLUS", "MINUS", "MUL", "DIV", "MOD",
               "EQ",
-              "IF", "THEN", "ENDIF"}
+              "IF", "THEN", "ENDIF", "ELSE"}
     
     ignore = ' \t'
     ignore_comma = ','
@@ -35,6 +35,7 @@ class CompLexer(Lexer):
     IF = r'IF'
     THEN = r'THEN'
     END = r'END'
+    ELSE = r'ELSE'
     
     identifier = r'[a-zA-Z_][a-zA-Z0-9_]*'
     

@@ -89,6 +89,17 @@ class CompParser(Parser):
         self.k_correction += 1
         self.out = ""
         return command
+
+    @_("IF condition THEN commands ELSE commands ENDIF")
+    def command(self, p):
+        p[3] = self.addToIndexesInIf(p[3], 1)
+        p[5] = self.addToIndexesInIf(p[5], 2)
+        self.out = p[1] + "JPOS " + str(self.k_correction - self.countLines(p[5]) + 2) + "\n" + p[3] +\
+                            "JUMP " + str(self.k_correction + 2) + "\n" + p[5]
+        command = self.out
+        self.k_correction += 1
+        self.out = ""
+        return command
         
     # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
 
@@ -263,7 +274,7 @@ class CompParser(Parser):
         commands = commands.split()
         ret = ""
         for commandIndex in range(len(commands)):
-            if commands[commandIndex] == "JPOS":
+            if commands[commandIndex] == "JUMP" or commands[commandIndex] == "JZERO" or commands[commandIndex] == "JPOS":
                 commands[commandIndex + 1] = str(int(commands[commandIndex + 1]) + shift)
             
             if commandIndex % 2 == 1:
