@@ -83,10 +83,10 @@ class CompParser(Parser):
     
     @_("IF condition THEN commands ENDIF")
     def command(self, p):
-        print("SELFOUT: " + str(p[3]) + "SELFOUT\n")
-        self.out += "JPOS " + str(self.getK()) + "\n"
+        p[3] = self.addToIndexesInIf(p[3], 1)
+        self.out = p[1] + "JPOS " + str(self.k_correction + 1) + "\n" + p[3]
         command = self.out
-        self.k_correction += self.getCurrK()
+        self.k_correction += 1
         self.out = ""
         return command
         
@@ -222,13 +222,18 @@ class CompParser(Parser):
     # EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION
     
     # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
-    @_("value EQ value") # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz
+    @_("value EQ value") # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz, zwraca kod
     def condition(self, p):
         self.out += "LOAD " + str(p[0]) + "\n"
         self.out += "SUB " + str(p[2]) + "\n"
         self.out += "JPOS " + str(self.getK() + 4) + "\n"
         self.out += "LOAD " + str(p[2]) + "\n"
         self.out += "SUB " + str(p[0]) + "\n"
+
+        command = self.out
+        self.k_correction += self.getCurrK()
+        self.out = ""
+        return command
     
     # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
     
@@ -250,6 +255,23 @@ class CompParser(Parser):
     def getK(self):
         #       Długość programu           Długość command      Długość poprzednich command w commands
         return self.program.count("\n") + self.out.count("\n") + self.k_correction - 1
+    
+    def countLines(self, text):
+        return text.count("\n")
+    
+    def addToIndexesInIf(self, commands, shift):
+        commands = commands.split()
+        ret = ""
+        for commandIndex in range(len(commands)):
+            if commands[commandIndex] == "JPOS":
+                commands[commandIndex + 1] = str(int(commands[commandIndex + 1]) + shift)
+            
+            if commandIndex % 2 == 1:
+                ret += " " + commands[commandIndex] + "\n"
+            else:
+                ret += commands[commandIndex]
+        return ret
+    
   
    
 if __name__ == '__main__':

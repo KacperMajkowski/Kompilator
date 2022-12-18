@@ -2,8 +2,15 @@ PROGRAM IS
 VAR X, Y, Z
 BEGIN
     READ X;
-    IF X = 4 THEN
-        WRITE X;
+    READ Y;
+    READ Z;
+    IF X = Y THEN
+        IF X = 1 THEN
+            WRITE X;
+        ENDIF
+
+        IF Y = Z THEN
+            WRITE Y;
+        ENDIF
     ENDIF
-    WRITE Z;
 END
