@@ -33,13 +33,11 @@ class CompParser(Parser):
     
     @_("declarations identifier")
     def declarations(self, p):
-        print("Declare variable", p[1])
         self.variables.append([self.currContext, p[1]])
         self.nextFreeIndex += 1
         
     @_("identifier")
     def declarations(self, p):
-        print("Declare variable", p[0])
         self.variables.append([self.currContext, p[0]])
         self.nextFreeIndex += 1
         
@@ -54,7 +52,6 @@ class CompParser(Parser):
     # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
     @_("READ identifier semi") # Zwraca swój kod
     def command(self, p):
-        print("Read input to variable", p[1], "on index", self.getVarCellIndex(p[1]))
         if self.getVarCellIndex(p[1]) is None:
             print("Błąd w lini", p.lineno, ": Nie znaleziono zmiennej", p[1])
         self.out += "GET " + str(self.getVarCellIndex(p[1])) + "\n"
@@ -65,7 +62,6 @@ class CompParser(Parser):
 
     @_("WRITE value semi") # Zwraca swój kod
     def command(self, p):
-        print("Put variable with index", p[1])
         self.out += "PUT " + str(p[1]) + "\n"
         command = self.out
         self.k_correction += self.getCurrK()
@@ -74,7 +70,6 @@ class CompParser(Parser):
 
     @_("identifier ASSIGN expression semi") # Zwraca swój kod
     def command(self, p):
-        print("Assign acc to", p[0])
         self.out += "STORE " + str(self.getVarCellIndex(p[0])) + "\n"
         command = self.out
         self.k_correction += self.getCurrK()
@@ -94,10 +89,11 @@ class CompParser(Parser):
     def command(self, p):
         p[3] = self.addToIndexesInIf(p[3], 1)
         p[5] = self.addToIndexesInIf(p[5], 2)
+                                                    # +1 za pętlę, +1 za jumpa
         self.out = p[1] + "JPOS " + str(self.k_correction - self.countLines(p[5]) + 2) + "\n" + p[3] +\
-                            "JUMP " + str(self.k_correction + 2) + "\n" + p[5]
+                            "JUMP " + str(self.k_correction + 2) + "\n" + p[5] # +1 za pętlę, (+1 za jumpa?)
         command = self.out
-        self.k_correction += 1
+        self.k_correction += 2
         self.out = ""
         return command
         
