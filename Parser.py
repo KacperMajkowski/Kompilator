@@ -89,9 +89,9 @@ class CompParser(Parser):
     def command(self, p):
         p[3] = self.addToIndexesInIf(p[3], 1)
         p[5] = self.addToIndexesInIf(p[5], 2)
-                                                    # +1 za pętlę, +1 za jumpa
+                                                    # +2 za JPOS i JUMP
         self.out = p[1] + "JPOS " + str(self.k_correction - self.countLines(p[5]) + 2) + "\n" + p[3] +\
-                            "JUMP " + str(self.k_correction + 2) + "\n" + p[5] # +1 za pętlę, (+1 za jumpa?)
+                            "JUMP " + str(self.k_correction + 2) + "\n" + p[5] # +2 za JPOS i JUMP
         command = self.out
         self.k_correction += 2
         self.out = ""
