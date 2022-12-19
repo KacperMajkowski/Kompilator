@@ -274,7 +274,7 @@ class CompParser(Parser):
     def condition(self, p):
         self.out += "SET 1" + "\n"
         self.out += "ADD " + str(p[0]) + "\n"
-        self.out += "SUB " + str(p[1]) + "\n"
+        self.out += "SUB " + str(p[2]) + "\n"
     
         command = self.out
         self.k_correction += self.getCurrK()
