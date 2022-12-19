@@ -3,22 +3,10 @@ VAR X, Y, Z
 BEGIN
     READ X;
     READ Y;
-    READ Z;
-    IF X = 1 THEN
-        WRITE 100;
-        IF Y = 2 THEN
-            WRITE 200;
-        ELSE
-            WRITE 222;
-        ENDIF
-
-        IF Z = 3 THEN
-            WRITE 300;
-        ELSE
-            WRITE 333;
-        ENDIF
+    IF X >= Y THEN
+        Z := X - Y;
     ELSE
-        WRITE 111;
+        Z := Y - X;
     ENDIF
-    WRITE X;
+    WRITE Z;
 END

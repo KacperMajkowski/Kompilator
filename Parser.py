@@ -125,13 +125,11 @@ class CompParser(Parser):
         self.out += "ADD " + str(p[2]) + "\n"
         self.tempIndexes = 0
 
-
     @_("value MINUS value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
         self.out += "LOAD " + str(p[0]) + "\n"
         self.out += "SUB " + str(p[2]) + "\n"
         self.tempIndexes = 0
-
 
     @_("value MUL value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
@@ -157,7 +155,6 @@ class CompParser(Parser):
         self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"         # Załaduj tX jako wynik
         
         self.tempIndexes = 0
-
 
     @_("value DIV value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
@@ -226,7 +223,7 @@ class CompParser(Parser):
     
         self.tempIndexes = 0
 
-    # EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION #EXPRESION
+    # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION
     
     # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
     @_("value EQ value") # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz, zwraca kod
@@ -237,6 +234,16 @@ class CompParser(Parser):
         self.out += "LOAD " + str(p[2]) + "\n"
         self.out += "SUB " + str(p[0]) + "\n"
 
+        command = self.out
+        self.k_correction += self.getCurrK()
+        self.out = ""
+        return command
+
+    @_("value GEQ value")  # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz, zwraca kod
+    def condition(self, p):
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "SUB " + str(p[0]) + "\n"
+    
         command = self.out
         self.k_correction += self.getCurrK()
         self.out = ""
