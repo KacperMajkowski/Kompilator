@@ -248,6 +248,16 @@ class CompParser(Parser):
         self.k_correction += self.getCurrK()
         self.out = ""
         return command
+
+    @_("value LEQ value")  # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz, zwraca kod
+    def condition(self, p):
+        self.out += "LOAD " + str(p[0]) + "\n"
+        self.out += "SUB " + str(p[2]) + "\n"
+    
+        command = self.out
+        self.k_correction += self.getCurrK()
+        self.out = ""
+        return command
     
     # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
     

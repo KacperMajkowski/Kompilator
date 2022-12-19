@@ -3,7 +3,7 @@ VAR X, Y, Z
 BEGIN
     READ X;
     READ Y;
-    IF X >= Y THEN
+    IF X <= Y THEN
         Z := X - Y;
     ELSE
         Z := Y - X;
