@@ -6,7 +6,7 @@ class CompLexer(Lexer):
               "PROGRAM_IS", "VAR", "BEGIN", "END",
               "READ", "WRITE", "ASSIGN",
               "PLUS", "MINUS", "MUL", "DIV", "MOD",
-              "EQ", "GEQ", "LEQ",
+              "EQ", "GEQ", "LEQ", "GT", "LT",
               "IF", "THEN", "ENDIF", "ELSE"}
     
     ignore = ' \t'
@@ -33,6 +33,8 @@ class CompLexer(Lexer):
     EQ = r'\='
     GEQ = r'>='
     LEQ = r'<='
+    GT = r'>'
+    LT = r'<'
     ENDIF = r'ENDIF'
     IF = r'IF'
     THEN = r'THEN'

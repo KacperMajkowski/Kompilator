@@ -258,6 +258,29 @@ class CompParser(Parser):
         self.k_correction += self.getCurrK()
         self.out = ""
         return command
+
+    @_("value GT value")  # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz, zwraca kod
+    def condition(self, p):
+        self.out += "SET 1" + "\n"
+        self.out += "ADD " + str(p[2]) + "\n"
+        self.out += "SUB " + str(p[0]) + "\n"
+    
+        command = self.out
+        self.k_correction += self.getCurrK()
+        self.out = ""
+        return command
+
+    @_("value LT value")  # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz, zwraca kod
+    def condition(self, p):
+        self.out += "SET 1" + "\n"
+        self.out += "ADD " + str(p[0]) + "\n"
+        self.out += "SUB " + str(p[1]) + "\n"
+    
+        command = self.out
+        self.k_correction += self.getCurrK()
+        self.out = ""
+        return command
+    
     
     # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
     
