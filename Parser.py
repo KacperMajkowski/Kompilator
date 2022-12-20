@@ -239,6 +239,23 @@ class CompParser(Parser):
         self.out = ""
         return command
 
+    @_("value NEQ value")  # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz, zwraca kod
+    def condition(self, p):
+        self.out += "LOAD " + str(p[0]) + "\n"
+        self.out += "SUB " + str(p[2]) + "\n"
+        self.out += "JPOS " + str(self.getK() + 7) + "\n"
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "SUB " + str(p[0]) + "\n"
+        self.out += "JPOS " + str(self.getK() + 4) + "\n"
+        self.out += "SET 1 " + "\n"
+        self.out += "JUMP " + str(self.getK() + 3) + "\n"
+        self.out += "SET 0 " + "\n"
+    
+        command = self.out
+        self.k_correction += self.getCurrK()
+        self.out = ""
+        return command
+
     @_("value GEQ value")  # Condition ustawia acc na 0 jeśli prawda, inne jeśli fałsz, zwraca kod
     def condition(self, p):
         self.out += "LOAD " + str(p[2]) + "\n"

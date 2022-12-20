@@ -3,10 +3,10 @@ VAR X, Y, Z
 BEGIN
     READ X;
     READ Y;
-    IF X > Y THEN
-        Z := X;
+    IF X != Y THEN
+        Z := X - Y;
     ELSE
-        Z := Y;
+        Z := X + Y;
     ENDIF
     WRITE Z;
 END
