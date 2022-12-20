@@ -96,7 +96,16 @@ class CompParser(Parser):
         self.k_correction += 2
         self.out = ""
         return command
-        
+
+    @_("WHILE condition DO commands ENDWHILE")
+    def command(self, p):
+        p[3] = self.addToIndexesInIf(p[3], 1)
+        self.out = p[1] + "JPOS " + str(self.k_correction + 2) + "\n" + p[3]\
+                   + "JUMP " + str(self.k_correction - self.countLines(p[1]) - self.countLines(p[3])) + "\n"
+        command = self.out
+        self.k_correction += 1
+        self.out = ""
+        return command
     # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
 
     # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE

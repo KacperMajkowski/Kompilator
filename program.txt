@@ -1,12 +1,14 @@
 PROGRAM IS
-VAR X, Y, Z
+VAR Liczba, Dzielnik, Max, Reszta
 BEGIN
-    READ X;
-    READ Y;
-    IF X != Y THEN
-        Z := X - Y;
-    ELSE
-        Z := X + Y;
-    ENDIF
-    WRITE Z;
+    READ Dzielnik;
+    READ Max;
+    Liczba := 0;
+    WHILE Liczba < Max DO
+        Liczba := Liczba + 1;
+        Reszta := Liczba % Dzielnik;
+        IF Reszta = 0 THEN
+            WRITE Liczba;
+        ENDIF
+    ENDWHILE
 END
