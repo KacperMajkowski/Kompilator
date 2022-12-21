@@ -1,14 +1,16 @@
+[ Binarna posta ć liczby ]
 PROGRAM IS
-VAR Liczba, Dzielnik, Max, Reszta
+VAR n, p
 BEGIN
-    READ Dzielnik;
-    READ Max;
-    Liczba := 0;
-    WHILE Liczba < Max DO
-        Liczba := Liczba + 1;
-        Reszta := Liczba % Dzielnik;
-        IF Reszta = 0 THEN
-            WRITE Liczba;
+    READ n;
+    REPEAT
+        p:=n/2;
+        p:=2*p;
+        IF n>p THEN
+            WRITE 1;
+        ELSE
+            WRITE 0;
         ENDIF
-    ENDWHILE
+        n:=n/2;
+    UNTIL n=0;
 END

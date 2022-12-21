@@ -8,7 +8,8 @@ class CompLexer(Lexer):
               "PLUS", "MINUS", "MUL", "DIV", "MOD",
               "EQ", "NEQ", "GEQ", "LEQ", "GT", "LT",
               "IF", "THEN", "ENDIF", "ELSE",
-              "WHILE", "DO", "ENDWHILE"}
+              "WHILE", "DO", "ENDWHILE",
+              "REPEAT", "UNTIL"}
     
     ignore = ' \t'
     ignore_comma = ','
@@ -44,7 +45,9 @@ class CompLexer(Lexer):
     ENDWHILE = r'ENDWHILE'
     END = r'END'
     WHILE = r'WHILE'
-    DO = 'DO'
+    DO = r'DO'
+    REPEAT = r'REPEAT'
+    UNTIL = r'UNTIL'
     
     identifier = r'[a-zA-Z_][a-zA-Z0-9_]*'
     

@@ -78,6 +78,7 @@ class CompParser(Parser):
     
     @_("IF condition THEN commands ENDIF")
     def command(self, p):
+        # Dodajemy 1 do indeksów p[3] bo dodajemy przed nim 1 nową liniję
         p[3] = self.addToIndexesInIf(p[3], 1)
         self.out = p[1] + "JPOS " + str(self.k_correction + 1) + "\n" + p[3]
         command = self.out
@@ -87,7 +88,9 @@ class CompParser(Parser):
 
     @_("IF condition THEN commands ELSE commands ENDIF")
     def command(self, p):
+        # Dodajemy 1 do indeksów p[3] bo dodajemy przed nim 1 nową liniję
         p[3] = self.addToIndexesInIf(p[3], 1)
+        # Dodajemy 2 do indeksów p[5] bo dodajemy przed nim 2 nowe liniji
         p[5] = self.addToIndexesInIf(p[5], 2)
                                                     # +2 za JPOS i JUMP
         self.out = p[1] + "JPOS " + str(self.k_correction - self.countLines(p[5]) + 2) + "\n" + p[3] +\
@@ -99,9 +102,22 @@ class CompParser(Parser):
 
     @_("WHILE condition DO commands ENDWHILE")
     def command(self, p):
+        
+        # Nie dodajemy indeksów do p[1] bo nie ma przed nim żadnych nowych komend
+        # Dodajemy 1 do indeksów p[3] bo dodajemy przed nim 2 nowe liniji
         p[3] = self.addToIndexesInIf(p[3], 1)
-        self.out = p[1] + "JPOS " + str(self.k_correction + 2) + "\n" + p[3]\
+        
+        self.out = p[1] + "JPOS " + str(self.k_correction + 2) + "\n" + p[3] \
                    + "JUMP " + str(self.k_correction - self.countLines(p[1]) - self.countLines(p[3])) + "\n"
+        command = self.out
+        self.k_correction += 1
+        self.out = ""
+        return command
+
+    @_("REPEAT commands UNTIL condition semi")
+    def command(self, p):
+        # Nie dodajemy indeksów do p[1] ani p[3] bo nie ma przed nimi żadnych nowych komend
+        self.out = p[1] + p[3] + "JPOS " + str(self.k_correction - self.countLines(p[3]) - self.countLines(p[1])) + "\n"
         command = self.out
         self.k_correction += 1
         self.out = ""
@@ -142,29 +158,79 @@ class CompParser(Parser):
 
     @_("value MUL value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
-        self.out += "SET 0\n"                       #Początkowy wynik
+        #Czy X lub Y jest zerem?
+        self.out += "LOAD " + str(p[0]) + "\n"
+        self.out += "JZERO " + str(self.getK() + 36) + "\n"
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "JZERO " + str(self.getK() + 34) + "\n"
+        
+        # ty = Y
+        # adr tY = nfi
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
         self.tempIndexes += 1
-        self.out += "LOAD " + str(p[2]) + "\n"      #Mnożnik
+        # Wynik = 0
+        # adr Wynik = nfi + 1
+        self.out += "SET 0" + "\n"
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
         self.tempIndexes += 1
-        self.out += "SET 1\n"                       #Jedynka
+        
+        # Counter = 1
+        # adr Counter = nfi + 2
+        Ceq1 = self.getK() + 1
+        self.out += "SET 1" + "\n"
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
         self.tempIndexes += 1
+        # tX = X
+        # adr Counter = nfi + 3
+        self.out += "LOAD " + str(p[0]) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.tempIndexes += 1
+        
+        # Counter > tY?
+        CgtTY = self.getK() + 1
+        self.out += "SET 1" + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "JZERO " + str(self.getK() + 9) + "\n"
+        
+        # Nie
+        # Counter = Counter + Counter
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        # tX = tX + tX
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        
+        # Back to Counter > tY
+        self.out += "JUMP " + str(CgtTY) + "\n"
 
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"         # Załaduj tY
-        start = self.getK()                                                                 # Zapisz początek pętli
-        self.out += "JZERO " + str(start + 8) + "\n"                                        # Czy Y == 0?
-        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"          # Y = Y - 1
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"        # Zapisz nowe Y
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"         # Załaduj tX
-        self.out += "ADD " + str(p[0]) + "\n"                                               # Dodaj oryginalne X
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"        # Zapisz nowe tX
-        self.out += "JUMP " + str(start) + "\n"                                             # Wróć na początek
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"         # Załaduj tX jako wynik
+        # Tak
+        # HALF Counter
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "HALF\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        # HALF tX
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "HALF\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        # W = W + tX
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        # tY = tY - Counter
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
+        
+        # tY = 0?
+        self.out += "JPOS " + str(Ceq1) + "\n"
+        
+        # Wynik
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
         
         self.tempIndexes = 0
-
+        
     @_("value DIV value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
         self.out += "LOAD " + str(p[0]) + "\n"
