@@ -312,12 +312,81 @@ class CompParser(Parser):
         # OUT W
         self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
         
-    
         self.tempIndexes = 0
-        
 
     @_("value MOD value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
+    
+        # tX = X; adr nfi + ti - 3
+        self.out += "LOAD " + str(p[0]) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.tempIndexes += 1
+        # tY = Y; adr nfi + ti - 2
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.tempIndexes += 1
+        # C = 1; adr nfi + ti - 1
+        self.out += "SET 1\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.tempIndexes += 1
+    
+        # Y = 0?
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "JZERO " + str(self.getK() + 31) + "\n"
+    
+        # tX < Y?
+        tXY = self.getK() + 1
+        self.out += "SET 1\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "SUB " + str(p[2]) + "\n"
+        self.out += "JZERO " + str(self.getK() + 27) + "\n"
+    
+        # tY > tX?
+        tYtX = self.getK() + 1
+        self.out += "SET 1\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "JZERO " + str(self.getK() + 9) + "\n"
+    
+        # tY = tY + tY
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+    
+        # C = C + C
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+    
+        # JUMP to tX < tY
+        self.out += "JUMP " + str(tYtX) + "\n"
+    
+        # HALF tY
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "HALF\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        # HALF C
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "HALF\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        # tX = tX - tY
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        # tY = Y
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        # C = 1
+        self.out += "SET 1\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+    
+        # JUMP to tX < Y
+        self.out += "JUMP " + str(tXY) + "\n"
+    
+        # OUT tX
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        
+        '''
         self.out += "LOAD " + str(p[0]) + "\n"
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
         self.tempIndexes += 1
@@ -342,7 +411,7 @@ class CompParser(Parser):
 
         # Ładujemy ostatnie tX jako wynik
         self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
-    
+        '''
         self.tempIndexes = 0
 
     # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION

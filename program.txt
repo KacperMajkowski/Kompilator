@@ -4,6 +4,6 @@ VAR n, p, z
 BEGIN
     READ n;
     READ p;
-    z := n*p;
+    z := n%p;
     WRITE z;
 END
