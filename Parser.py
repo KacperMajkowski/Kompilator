@@ -108,9 +108,9 @@ class CompParser(Parser):
         p[3] = self.addToIndexesInIf(p[3], 1)
         
         self.out = p[1] + "JPOS " + str(self.k_correction + 2) + "\n" + p[3] \
-                   + "JUMP " + str(self.k_correction - self.countLines(p[1]) - self.countLines(p[3])) + "\n"
+                   + "JUMP " + str(self.k_correction - self.countLines(p[1]) - self.countLines(p[3]) + 1) + "\n"
         command = self.out
-        self.k_correction += 1
+        self.k_correction += 2
         self.out = ""
         return command
 
@@ -160,9 +160,9 @@ class CompParser(Parser):
     def expression(self, p):
         #Czy X lub Y jest zerem?
         self.out += "LOAD " + str(p[0]) + "\n"
-        self.out += "JZERO " + str(self.getK() + 34) + "\n"
+        self.out += "JZERO " + str(self.getK() + 35) + "\n"
         self.out += "LOAD " + str(p[2]) + "\n"
-        self.out += "JZERO " + str(self.getK() + 32) + "\n"
+        self.out += "JZERO " + str(self.getK() + 33) + "\n"
         
         # ty = Y
         # adr tY = nfi
@@ -386,32 +386,6 @@ class CompParser(Parser):
         # OUT tX
         self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
         
-        '''
-        self.out += "LOAD " + str(p[0]) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
-        self.tempIndexes += 1
-    
-        # Czy Y == 0?
-        self.out += "LOAD " + str(p[2]) + "\n"
-        self.out += "JZERO " + str(self.getK() + 12) + "\n"
-    
-        # Odejmujemy aż nie otrzymamy zera
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
-        start = self.getK()
-        self.out += "JZERO " + str(start + 9) + "\n"    # Czy początkowe X == 0?
-        self.out += "SUB " + str(p[2]) + "\n"
-        self.out += "JZERO " + str(self.getK() + 4) + "\n"  # Czy po odjęciu X-Y == 0?
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
-        self.out += "JUMP " + str(start + 1) + "\n"
-
-        # Czy dzieli dokładnie?
-        self.out += "LOAD " + str(p[2]) + "\n"
-        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
-        self.out += "JZERO " + str(self.getK() + 3) + "\n"
-
-        # Ładujemy ostatnie tX jako wynik
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
-        '''
         self.tempIndexes = 0
 
     # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION # EXPRESSION
@@ -521,8 +495,10 @@ class CompParser(Parser):
             if commands[commandIndex] == "JUMP" or commands[commandIndex] == "JZERO" or commands[commandIndex] == "JPOS":
                 commands[commandIndex + 1] = str(int(commands[commandIndex + 1]) + shift)
             
-            if commandIndex % 2 == 1:
-                ret += " " + commands[commandIndex] + "\n"
+            if commands[commandIndex].isdigit() or commands[commandIndex] == "HALF":
+                if commands[commandIndex] != "HALF":
+                    ret += " "
+                ret += commands[commandIndex] + "\n"
             else:
                 ret += commands[commandIndex]
         return ret
@@ -540,5 +516,6 @@ if __name__ == '__main__':
     code += "HALT\n"
     print(" ")
     print(code)
+    open("output.txt", 'w').write(code)
     #print(parser.variables)
     
