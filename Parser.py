@@ -160,9 +160,9 @@ class CompParser(Parser):
     def expression(self, p):
         #Czy X lub Y jest zerem?
         self.out += "LOAD " + str(p[0]) + "\n"
-        self.out += "JZERO " + str(self.getK() + 36) + "\n"
-        self.out += "LOAD " + str(p[2]) + "\n"
         self.out += "JZERO " + str(self.getK() + 34) + "\n"
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "JZERO " + str(self.getK() + 32) + "\n"
         
         # ty = Y
         # adr tY = nfi
@@ -233,41 +233,88 @@ class CompParser(Parser):
         
     @_("value DIV value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
+        
+        # tX = X; adr nfi + ti - 4
         self.out += "LOAD " + str(p[0]) + "\n"
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
         self.tempIndexes += 1
-        self.out += "SET 0" + "\n"
+        # tY = Y; adr nfi + ti - 3
+        self.out += "LOAD " + str(p[2]) + "\n"
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
         self.tempIndexes += 1
-        
-        # Czy Y == 0?
-        self.out += "LOAD " + str(p[2]) + "\n"
-        self.out += "JZERO " + str(self.getK() + 16) + "\n"
-        
-        # Dodaj 1 żeby dzielić całkowicie, potem odejmiemy 1 od wyniku
+        # C = 1; adr nfi + ti - 2
         self.out += "SET 1\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.tempIndexes += 1
+        # W = 0; adr nfi + ti - 1
+        self.out += "SET 0\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.tempIndexes += 1
+
+        # Y = 0?
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "JZERO " + str(self.getK() + 34) + "\n"
+        
+        # tX < Y?
+        tXY = self.getK() + 1
+        self.out += "SET 1\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
+        self.out += "SUB " + str(p[2]) + "\n"
+        self.out += "JZERO " + str(self.getK() + 30) + "\n"
+        
+        
+        # tY > tX?
+        tYtX = self.getK() + 1
+        self.out += "SET 1\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "JZERO " + str(self.getK() + 9) + "\n"
+        
+        # tY = tY + tY
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+
+        # C = C + C
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
         self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
         
-        # Odejmujemy aż nie otrzymamy zera
+        # JUMP to tX < tY
+        self.out += "JUMP " + str(tYtX) + "\n"
+        
+        # HALF tY
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "HALF\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        # HALF C
         self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
-        start = self.getK()
-        self.out += "JZERO " + str(start + 8) + "\n"
-        self.out += "SUB " + str(p[2]) + "\n"
+        self.out += "HALF\n"
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
-        self.out += "SET 1\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        # tX = tX - tY
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
+        # tY = Y
+        self.out += "LOAD " + str(p[2]) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        # W = W + C
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
-        self.out += "JUMP " + str(start) + "\n"
-        
-        #Odejmujemy 1
+        # C = 1
         self.out += "SET 1\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
-        self.tempIndexes += 1
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
-        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
         
+        # JUMP to tX < Y
+        self.out += "JUMP " + str(tXY) + "\n"
+        
+        # OUT W
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        
+    
         self.tempIndexes = 0
+        
 
     @_("value MOD value")  # Expresion ustawia akumulator na wynik, p - indeksy w pamięci
     def expression(self, p):
