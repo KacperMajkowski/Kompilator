@@ -1,0 +1,5 @@
+Opcja 1)
+- Dodaje indeksy po ifie tylko jeśli skacze przed PROGRAM IS
+
+Opcja 2)
+- Wkleja funkcję
