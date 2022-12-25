@@ -1,4 +1,13 @@
 [ Binarna posta ć liczby ]
+
+PROCEDURE swap(a, b) IS
+VAR c
+BEGIN
+    c := a
+    a := b
+    b := c
+END
+
 PROGRAM IS
 VAR n, max, i, prime, rem
 BEGIN

@@ -9,7 +9,8 @@ class CompLexer(Lexer):
               "EQ", "NEQ", "GEQ", "LEQ", "GT", "LT",
               "IF", "THEN", "ENDIF", "ELSE",
               "WHILE", "DO", "ENDWHILE",
-              "REPEAT", "UNTIL"}
+              "REPEAT", "UNTIL",
+              "PROCEDURE", "IS", "LB", "RB"}
     
     ignore = ' \t'
     ignore_comma = ','
@@ -48,6 +49,10 @@ class CompLexer(Lexer):
     DO = r'DO'
     REPEAT = r'REPEAT'
     UNTIL = r'UNTIL'
+    PROCEDURE = r'procedure'
+    IS = r'IS'
+    LB = r'\('
+    RB = r'\)'
     
     identifier = r'[a-zA-Z_][a-zA-Z0-9_]*'
     

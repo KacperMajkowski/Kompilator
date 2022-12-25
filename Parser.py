@@ -17,7 +17,7 @@ class CompParser(Parser):
     program = ""
     k_correction = 0
 
-    @_("main")
+    @_("procedures main")
     def program_all(self, p):
         pass
     
@@ -94,7 +94,7 @@ class CompParser(Parser):
         p[5] = self.addToIndexesInIf(p[5], 2)
                                                     # +2 za JPOS i JUMP
         self.out = p[1] + "JPOS " + str(self.k_correction - self.countLines(p[5]) + 2) + "\n" + p[3] +\
-                            "JUMP " + str(self.k_correction + 2) + "\n" + p[5] # +2 za JPOS i JUMP
+                            "JUMP " + str(self.k_correction + 2) + "\n" + p[5]  # +2 za JPOS i JUMP
         command = self.out
         self.k_correction += 2
         self.out = ""
@@ -104,7 +104,7 @@ class CompParser(Parser):
     def command(self, p):
         
         # Nie dodajemy indeksów do p[1] bo nie ma przed nim żadnych nowych komend
-        # Dodajemy 1 do indeksów p[3] bo dodajemy przed nim 2 nowe liniji
+        # Dodajemy 1 do indeksów p[3] bo dodajemy przed nim 1 nowa linia
         p[3] = self.addToIndexesInIf(p[3], 1)
         
         self.out = p[1] + "JPOS " + str(self.k_correction + 2) + "\n" + p[3] \
