@@ -49,7 +49,7 @@ class CompLexer(Lexer):
     DO = r'DO'
     REPEAT = r'REPEAT'
     UNTIL = r'UNTIL'
-    PROCEDURE = r'procedure'
+    PROCEDURE = r'PROCEDURE'
     IS = r'IS'
     LB = r'\('
     RB = r'\)'

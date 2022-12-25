@@ -1,34 +1,35 @@
 [ Binarna posta ć liczby ]
 
 PROCEDURE swap(a, b) IS
-VAR c
 BEGIN
-    c := a
-    a := b
-    b := c
+    a := b;
+END
+
+PROCEDURE double(a) IS
+BEGIN
+    a := a * 2;
+END
+
+PROCEDURE writeIndex(x) IS
+BEGIN
+    WRITE x;
+END
+
+PROCEDURE add1(x) IS
+BEGIN
+    x := x + 1;
+END
+
+PROCEDURE add1double(x) IS
+BEGIN
+    x := x + 1;
+    x := x * 2;
 END
 
 PROGRAM IS
-VAR n, max, i, prime, rem
+VAR x
 BEGIN
-    n := 2;
-    READ max;
-    REPEAT
-        prime := 1;
-        i := 2;
-        WHILE i < n DO
-             rem := n%i;
-             IF rem = 0 THEN
-                prime := 0;
-             ENDIF
-             i := i + 1;
-        ENDWHILE
-
-        IF prime = 1 THEN
-            WRITE n;
-        ENDIF
-
-        prime := 1;
-        n := n+1;
-    UNTIL n >= max;
+    READ x;
+    add1double(x);
+    WRITE x;
 END
