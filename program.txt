@@ -6,28 +6,33 @@ BEGIN
     y := z;
 END
 
-PROCEDURE add1(x) IS
+PROCEDURE add1(a) IS
 VAR y
 BEGIN
     y := 1;
-    x := x + y;
+    a := a + y;
+END
+
+PROCEDURE add2(x) IS
+BEGIN
+    add1(x);
+    add1(x);
 END
 
 PROCEDURE makeOdd(x) IS
 VAR y
 BEGIN
-    y := x % 2;
-    IF y = 0 THEN
-        x := x + 1;
+    y := x%2;
+    IF y = 1 THEN
+        x := 10;
     ENDIF
+    add1(x);
 END
 
 PROGRAM IS
-VAR x, y, z, w
+VAR x
 BEGIN
     READ x;
-    READ y;
-    swap(x, y);
+    makeOdd(x);
     WRITE x;
-    WRITE y;
 END

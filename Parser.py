@@ -10,8 +10,10 @@ class CompParser(Parser):
     tempIndexes = 0
     currContext = 0
     nextFreeContext = 0
+    addedContext = False
     
     variables = [[0, "acc", "og"]]
+    procedureDeclarations = []
     proceduresTable = []
 
     out = ""
@@ -26,47 +28,67 @@ class CompParser(Parser):
     def procedures(self, p):
         self.variables = self.fixContexts(self.variables)
         self.k_correction = 0
-        return self.proceduresTable.append([p[2], p[7]])
+        self.proceduresTable.append([p[2], p[7]])
+        self.nextFreeContext += 2
+        self.currContext += 2
 
     @_("procedures PROCEDURE proc_head IS BEGIN commands END")
     def procedures(self, p):
         self.variables = self.fixContexts(self.variables)
         self.k_correction = 0
-        return self.proceduresTable.append([p[2], p[5]])
-
+        self.proceduresTable.append([p[2], p[5]])
+        self.nextFreeContext += 2
+        self.currContext += 2
+        
     @_("")
     def procedures(self, p):
         self.k_correction = 0
     
     @_("identifier LB arguments RB")
     def proc_head(self, p):
-        if self.getProcedure(p[0]) is not None:
+        if self.getProcedureDeclaration(p[0]) is not None:
             p[0] = self.addToIndexesInIf(p[0], self.countLines(p[2]))
             p[2] = self.replacePointers(p[2], p[0])
             self.out += str(p[2])
+        else:
+            self.procedureDeclarations.append(p[0])
         return p[0]
     
     @_("arguments identifier")
     def arguments(self, p):
-        self.variables.append([self.nextFreeContext - 1, p[1], "ref"])
+        self.variables.append([self.nextFreeContext, p[1], "ref"])
         self.nextFreeIndex += 1
         ret = ""
-        ret += "SET " + str(self.getVarCellIndex(p[1], self.currContext)) + "\n"
+        print(self.variables)
+        print(p[1])
+        print(self.currContext)
+        print(self.getVarCellIndex(p[1], self.currContext))
+        if self.variables[self.getVarCellIndex(p[1], self.currContext)][2] == "og":
+            ret += "SET " + str(self.getVarCellIndex(p[1], self.currContext)) + "\n"
+        else:
+            ret += "LOAD " + str(self.getVarCellIndex(p[1], self.currContext)) + "\n"
         ret += "STORE " + "?" + "\n"
         return p[0] + ret
 
     @_("identifier")
     def arguments(self, p):
-        self.nextFreeContext += 1
-        self.variables.append([self.nextFreeContext - 1, p[0], "ref"])
+        self.variables.append([self.nextFreeContext, p[0], "ref"])
         self.nextFreeIndex += 1
         ret = ""
-        ret += "SET " + str(self.getVarCellIndex(p[0], self.currContext)) + "\n"
+        print(self.variables)
+        print(p[0])
+        print(self.currContext)
+        print(self.getVarCellIndex(p[0], self.currContext))
+        if self.variables[self.getVarCellIndex(p[0], self.currContext)][2] == "og":
+            ret += "SET " + str(self.getVarCellIndex(p[0], self.currContext)) + "\n"
+        else:
+            ret += "LOAD " + str(self.getVarCellIndex(p[0], self.currContext)) + "\n"
         ret += "STORE " + "?" + "\n"
         return ret
         
     @_("PROGRAM_IS VAR declarations BEGIN commands END")
     def main(self, p):
+        print(p[4])
         p[4] = self.replaceVariables(p[4])
         self.program = p[4]
         pass
@@ -79,17 +101,15 @@ class CompParser(Parser):
     
     @_("declarations identifier")
     def declarations(self, p):
-        self.variables.append([self.nextFreeContext - 1, p[1], "og"])
+        self.variables.append([self.nextFreeContext, p[1], "og"])
         self.nextFreeIndex += 1
         
     @_("identifier")
     def declarations(self, p):
         self.nextFreeIndex = len(self.variables)
-        self.nextFreeContext += 1
-        self.variables.append([self.nextFreeContext - 1, p[0], "og"])
+        self.variables.append([self.nextFreeContext, p[0], "og"])
         self.nextFreeIndex += 1
-        self.variables[0][0] = self.nextFreeContext - 1
-        self.currContext = self.nextFreeContext - 1
+        self.variables[0][0] = self.nextFreeContext
         
     @_("commands command")  # Zwraca kod commands
     def commands(self, p):
@@ -102,11 +122,11 @@ class CompParser(Parser):
     # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
     @_("proc_head semi")
     def command(self, p):
-        self.out += "Procedure " + str(p[0]) + " "
+        self.out += "Procedure " + str(p[0]) #+ " "
         self.k_correction += self.getCurrK()
         tempK = self.getCurrK()
         self.out += self.addToIndexesInIf(self.proceduresTable[int(self.getProcedure(p[0])/2)][1], self.k_correction)
-        self.out += "EndProcedure " + str(p[0]) + " "
+        self.out += "EndProcedure " + str(p[0]) #+ " "
         command = self.out
         self.k_correction += self.getCurrK() - tempK
         self.out = ""
@@ -547,9 +567,18 @@ class CompParser(Parser):
         #print(self.variables, context, x, "not found")
         
     def getProcedure(self, funcName):
+        if funcName[-1] == " ":
+            funcName = funcName[:-1]
         for procedureIndex in range(len(self.proceduresTable)):
             if self.proceduresTable[procedureIndex][0] == funcName:
                 return procedureIndex*2
+        #print("Procedure '" + funcName + "' not found in", self.proceduresTable)
+        return None
+    
+    def getProcedureDeclaration(self, funcName):
+        for procedureIndex in range(len(self.procedureDeclarations)):
+            if self.procedureDeclarations[procedureIndex] == funcName:
+                return procedureIndex
         #print("Procedure", funcName, "not found in", self.proceduresTable)
         return None
 
@@ -558,7 +587,8 @@ class CompParser(Parser):
         commands = commands.split()
         ret = ""
         contexts = list(map(lambda x: x[0], self.variables))
-        firstIndex = contexts.index(self.getProcedure(funcName))
+        firstIndex = contexts[1:].index(self.getProcedure(funcName)) + 1
+        print("ProcedureName = ", funcName, "GetProcedure ", self.getProcedure(funcName), "index: ", firstIndex, "contexts: ", contexts)
         for commandIndex in range(len(commands)):
             if commands[commandIndex] == "?":
                 commands[commandIndex] = str(firstIndex + curr)
@@ -572,10 +602,10 @@ class CompParser(Parser):
                 ret += commands[commandIndex]
         return ret
                 
-    def replaceVariables(self, commands):
+    def replaceVariables(self, commandsStr):
         contextStack = [self.variables[0][0]]
         
-        commands = re.split(r"\n| ", commands)
+        commands = re.split(r"\n| ", commandsStr)
         ret = ""
         for commandIndex in range(len(commands)):
             if len(str(commands[commandIndex])) > 1:
@@ -585,8 +615,18 @@ class CompParser(Parser):
                     print(contextStack)
                     if len(contextStack) > 1 and\
                             self.variables[self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])][2] == "ref":
-                        ret += "I"
-                    commands[commandIndex] = self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])
+                        if commands[commandIndex - 1] != "PUT":
+                            ret += "I"
+                            commands[commandIndex] = self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])
+                        else:
+                            ret = ret[:-3]
+                            ret += "LOAD " + str(self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])) + "\n"
+                            commands[commandIndex] = str(commands[commandIndex - 1]) + " 0\n"
+                            
+                            commandsStr = self.addToIndexesInIf(commandsStr[commandIndex+1:], 1)
+                            commands = commands[:commandIndex] + re.split(r"\n| ", commandsStr)
+                    else:
+                        commands[commandIndex] = self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])
                 
             if commands[commandIndex] == "Procedure":
                 contextStack.append(self.getProcedure(commands[commandIndex + 1]))
@@ -627,11 +667,9 @@ class CompParser(Parser):
                 commands[commandIndex + 1] = str(int(commands[commandIndex + 1]) + shift)
             
             if commands[commandIndex].isdigit() or commands[commandIndex] == "HALF" or commands[commandIndex][-1] == ">":
-                if commands[commandIndex] != "HALF":
-                    ret += " "
                 ret += commands[commandIndex] + "\n"
             else:
-                ret += commands[commandIndex]
+                ret += commands[commandIndex] + " "
         return ret
     
     def sub1fromVariablesDeclaredInProcedure(self, context):
