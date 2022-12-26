@@ -1,35 +1,33 @@
-[ Binarna posta ć liczby ]
-
-PROCEDURE swap(a, b) IS
+PROCEDURE swap(x, y) IS
+VAR z
 BEGIN
-    a := b;
-END
-
-PROCEDURE double(a) IS
-BEGIN
-    a := a * 2;
-END
-
-PROCEDURE writeIndex(x) IS
-BEGIN
-    WRITE x;
+    z := x;
+    x := y;
+    y := z;
 END
 
 PROCEDURE add1(x) IS
+VAR y
 BEGIN
-    x := x + 1;
+    y := 1;
+    x := x + y;
 END
 
-PROCEDURE add1double(x) IS
+PROCEDURE makeOdd(x) IS
+VAR y
 BEGIN
-    x := x + 1;
-    x := x * 2;
+    y := x % 2;
+    IF y = 0 THEN
+        x := x + 1;
+    ENDIF
 END
 
 PROGRAM IS
-VAR x
+VAR x, y, z, w
 BEGIN
     READ x;
-    add1double(x);
+    READ y;
+    swap(x, y);
     WRITE x;
+    WRITE y;
 END

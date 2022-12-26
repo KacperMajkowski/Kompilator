@@ -11,7 +11,7 @@ class CompParser(Parser):
     currContext = 0
     nextFreeContext = 0
     
-    variables = [[0, "acc"]]
+    variables = [[0, "acc", "og"]]
     proceduresTable = []
 
     out = ""
@@ -24,11 +24,13 @@ class CompParser(Parser):
     
     @_("procedures PROCEDURE proc_head IS VAR declarations BEGIN commands END")
     def procedures(self, p):
+        self.variables = self.fixContexts(self.variables)
         self.k_correction = 0
         return self.proceduresTable.append([p[2], p[7]])
 
     @_("procedures PROCEDURE proc_head IS BEGIN commands END")
     def procedures(self, p):
+        self.variables = self.fixContexts(self.variables)
         self.k_correction = 0
         return self.proceduresTable.append([p[2], p[5]])
 
@@ -46,7 +48,7 @@ class CompParser(Parser):
     
     @_("arguments identifier")
     def arguments(self, p):
-        self.variables.append([self.nextFreeContext - 1, p[1]])
+        self.variables.append([self.nextFreeContext - 1, p[1], "ref"])
         self.nextFreeIndex += 1
         ret = ""
         ret += "SET " + str(self.getVarCellIndex(p[1], self.currContext)) + "\n"
@@ -56,7 +58,7 @@ class CompParser(Parser):
     @_("identifier")
     def arguments(self, p):
         self.nextFreeContext += 1
-        self.variables.append([self.nextFreeContext - 1, p[0]])
+        self.variables.append([self.nextFreeContext - 1, p[0], "ref"])
         self.nextFreeIndex += 1
         ret = ""
         ret += "SET " + str(self.getVarCellIndex(p[0], self.currContext)) + "\n"
@@ -77,14 +79,14 @@ class CompParser(Parser):
     
     @_("declarations identifier")
     def declarations(self, p):
-        self.variables.append([self.nextFreeContext - 1, p[1]])
+        self.variables.append([self.nextFreeContext - 1, p[1], "og"])
         self.nextFreeIndex += 1
         
     @_("identifier")
     def declarations(self, p):
         self.nextFreeIndex = len(self.variables)
         self.nextFreeContext += 1
-        self.variables.append([self.nextFreeContext - 1, p[0]])
+        self.variables.append([self.nextFreeContext - 1, p[0], "og"])
         self.nextFreeIndex += 1
         self.variables[0][0] = self.nextFreeContext - 1
         self.currContext = self.nextFreeContext - 1
@@ -100,11 +102,10 @@ class CompParser(Parser):
     # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
     @_("proc_head semi")
     def command(self, p):
-        print("Before procHead Kcorr", self.k_correction)
         self.out += "Procedure " + str(p[0]) + " "
         self.k_correction += self.getCurrK()
         tempK = self.getCurrK()
-        self.out += self.addToIndexesInIf(self.proceduresTable[self.getProcedure(p[0])][1], self.k_correction)
+        self.out += self.addToIndexesInIf(self.proceduresTable[int(self.getProcedure(p[0])/2)][1], self.k_correction)
         self.out += "EndProcedure " + str(p[0]) + " "
         command = self.out
         self.k_correction += self.getCurrK() - tempK
@@ -118,7 +119,6 @@ class CompParser(Parser):
         self.out += "GET " + str(p[1]) + ">" + "\n"
         command = self.out
         self.k_correction += self.getCurrK()
-        print("Added", self.getCurrK(), "to Kcorr")
         self.out = ""
         return command
 
@@ -243,9 +243,6 @@ class CompParser(Parser):
         
         # Counter = 1
         # adr Counter = nfi + 2
-        print("Program: ", self.program)
-        print("Out:", self.out)
-        print("Kcorr", self.k_correction)
         Ceq1 = self.getK() + 1
         self.out += "SET 1" + "\n"
         self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000*(self.currContext + 1)) + "\n"
@@ -552,7 +549,7 @@ class CompParser(Parser):
     def getProcedure(self, funcName):
         for procedureIndex in range(len(self.proceduresTable)):
             if self.proceduresTable[procedureIndex][0] == funcName:
-                return procedureIndex
+                return procedureIndex*2
         #print("Procedure", funcName, "not found in", self.proceduresTable)
         return None
 
@@ -574,36 +571,20 @@ class CompParser(Parser):
             else:
                 ret += commands[commandIndex]
         return ret
-    
-    def replaceVariablesOnContext(self, commands, context):
-        possVariables = []
-        for var in self.variables:
-            if var[0] == context:
-                possVariables.append(var)
-                
-        commands = commands.split()
-        ret = ""
-        for commandIndex in range(len(commands)):
-            if commands[commandIndex][-1] == ">":
-                commands[commandIndex] = self.getVarCellIndex(commands[commandIndex][:-1], context)
-            
-            if commands[commandIndex].isdigit() or commands[commandIndex] == "HALF":
-                if commands[commandIndex] != "HALF":
-                    ret += " "
-                ret += commands[commandIndex] + "\n"
-            else:
-                ret += commands[commandIndex]
                 
     def replaceVariables(self, commands):
         contextStack = [self.variables[0][0]]
         
         commands = re.split(r"\n| ", commands)
-        print(commands)
         ret = ""
         for commandIndex in range(len(commands)):
             if len(str(commands[commandIndex])) > 1:
                 if commands[commandIndex][-1] == ">":
-                    if len(contextStack) > 1:
+                    print(self.variables)
+                    print(commands[commandIndex])
+                    print(contextStack)
+                    if len(contextStack) > 1 and\
+                            self.variables[self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])][2] == "ref":
                         ret += "I"
                     commands[commandIndex] = self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])
                 
@@ -624,13 +605,6 @@ class CompParser(Parser):
                 ret += str(commands[commandIndex])
         
         return ret
-    
-    def replaceWithReferences(self, commands):
-        pass
-    
-    
-        
-        
 
     # Zwraca linię w obecnej command
     def getCurrK(self):
@@ -660,6 +634,31 @@ class CompParser(Parser):
                 ret += commands[commandIndex]
         return ret
     
+    def sub1fromVariablesDeclaredInProcedure(self, context):
+        for varIndex in range(len(self.variables)):
+            if self.variables[varIndex][0] == context:
+                self.variables[varIndex][0] -= 1
+                
+        return self.variables
+    
+    def fixContexts(self, variables):
+        for var in variables:
+            if var[0] % 2 == 1:
+                var[0] -= 1
+        return variables
+    
+    def halfContexts(self, variables):
+        
+        done = False
+        for var in variables:
+            if var[0] % 2 == 1:
+                done = True
+        
+        if not done:
+            for var in variables:
+                var[0] = int(var[0]/2)
+        return variables
+        
   
    
 if __name__ == '__main__':
