@@ -1,1 +1,1 @@
-Blad: Druga deklaracja zmiennej 'c' w lini 3
+Niezadeklarowana zmienna d w funkcji 'pa'
