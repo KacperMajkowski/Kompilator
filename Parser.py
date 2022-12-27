@@ -564,7 +564,7 @@ class CompParser(Parser):
         for cellIndex in range(len(self.variables)):
             if context == self.variables[cellIndex][0] and x == self.variables[cellIndex][1]:
                 return cellIndex
-        #print(self.variables, context, x, "not found")
+        # print(self.variables, context, x, "not found")
         
     def getProcedure(self, funcName):
         if funcName[-1] == " ":
