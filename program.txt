@@ -1,6 +1,6 @@
-[błąd: druga deklaracja zmiennej a w linii 2]
+[błąd: druga deklaracja zmiennej c w linii 3]
 PROCEDURE pa(a,b) IS
-VAR c,d,a
+VAR c,c
 BEGIN
   c:=a;
   a:=c+d;

@@ -95,7 +95,7 @@ class CompParser(Parser):
         else:
             self.isError = True
             if self.errormess == "":
-                self.errormess += "Blad: Druga deklaracja zmiennej '" + str(p[1]) + "' w lini " + str(p.lineno) + "\n"
+                self.errormess += "Blad: Druga deklaracja zmiennej '" + str(p[0]) + "' w lini " + str(p.lineno) + "\n"
             self.error(p)
         return ret
     
@@ -133,7 +133,7 @@ class CompParser(Parser):
         else:
             self.isError = True
             if self.errormess == "":
-                self.errormess += "Blad: Druga deklaracja zmiennej '" + str(p[1]) + "' w lini " + str(p.lineno) + "\n"
+                self.errormess += "Blad: Druga deklaracja zmiennej '" + str(p[0]) + "' w lini " + str(p.lineno) + "\n"
             self.error(p)
     
     @_("commands command")  # Zwraca kod commands
@@ -583,13 +583,14 @@ class CompParser(Parser):
     
     def error(self, p):
         print("Error in line", p.lineno)
+        open("output.txt", 'w').write(self.errormess)
+        raise SyntaxError
     
     # Zwraca indeks zmiennej w pamięci
     def getVarCellIndex(self, x, context):
         for cellIndex in range(len(self.variables)):
             if context == self.variables[cellIndex][0] and x == self.variables[cellIndex][1]:
                 return cellIndex
-        # print(self.variables, context, x, "not found")
     
     def getProcedure(self, funcName):
         if funcName[-1] == " ":
@@ -728,6 +729,7 @@ class CompParser(Parser):
         return variables
     
     def variableExists(self, context, name, variables):
+        print("Checking if variable[", context, name, "] exists in [", variables, "]")
         for var in variables:
             if var[0] == context and var[1] == name:
                 return True
@@ -739,13 +741,11 @@ if __name__ == '__main__':
     parser = CompParser()
     
     text = open("program.txt").read()
-    result = parser.parse(lexer.tokenize(text))
+    commands = lexer.tokenize(text)
+    result = parser.parse(commands)
     parser.program += parser.out
-    if not parser.isError:
-        code = parser.program
-        code += "HALT\n"
-    else:
-        code = parser.errormess
+    code = parser.program
+    code += "HALT\n"
     print(" ")
     print(code)
     open("output.txt", 'w').write(code)

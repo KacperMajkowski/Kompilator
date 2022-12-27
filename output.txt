@@ -1,1 +1,1 @@
-Blad: Druga deklaracja zmiennej 'a' w lini 3
+Blad: Druga deklaracja zmiennej 'c' w lini 3
