@@ -276,45 +276,45 @@ class CompParser(Parser):
         # Counter > tY?
         CgtTY = self.getK() + 1
         self.out += "SET 1" + "\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 4 + 1000*(self.currContext + 1)) + "\n"
-        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000*(self.currContext + 1)) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 4 + 1000) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         self.out += "JZERO " + str(self.getK() + 9) + "\n"
         
         # Nie
         # Counter = Counter + Counter
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000*(self.currContext + 1)) + "\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000*(self.currContext + 1)) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000*(self.currContext + 1)) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         # tX = tX + tX
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000*(self.currContext + 1)) + "\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000*(self.currContext + 1)) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000*(self.currContext + 1)) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
         
         # Back to Counter > tY
         self.out += "JUMP " + str(CgtTY) + "\n"
 
         # Tak
         # HALF Counter
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000*(self.currContext + 1)) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         self.out += "HALF\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000*(self.currContext + 1)) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         # HALF tX
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000*(self.currContext + 1)) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
         self.out += "HALF\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000*(self.currContext + 1)) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
         # W = W + tX
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000*(self.currContext + 1)) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000*(self.currContext + 1)) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
         # tY = tY - Counter
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 4 + 1000*(self.currContext + 1)) + "\n"
-        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000*(self.currContext + 1)) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 4 + 1000*(self.currContext + 1)) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 4 + 1000) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 4 + 1000) + "\n"
         
         # tY = 0?
         self.out += "JPOS " + str(Ceq1) + "\n"
         
         # Wynik
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000*(self.currContext + 1)) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
 
         self.nextFreeIndex += self.tempIndexes
         self.tempIndexes = 0
@@ -324,19 +324,19 @@ class CompParser(Parser):
         
         # tX = X; adr nfi + ti - 4
         self.out += "LOAD " + str(p[0]) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
         # tY = Y; adr nfi + ti - 3
         self.out += "LOAD " + str(p[2]) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
         # C = 1; adr nfi + ti - 2
         self.out += "SET 1\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
         # W = 0; adr nfi + ti - 1
         self.out += "SET 0\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
 
         # Y = 0?
@@ -346,7 +346,7 @@ class CompParser(Parser):
         # tX < Y?
         tXY = self.getK() + 1
         self.out += "SET 1\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 4 + 1000) + "\n"
         self.out += "SUB " + str(p[2]) + "\n"
         self.out += "JZERO " + str(self.getK() + 30) + "\n"
         
@@ -354,51 +354,51 @@ class CompParser(Parser):
         # tY > tX?
         tYtX = self.getK() + 1
         self.out += "SET 1\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
-        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 4 + 1000) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
         self.out += "JZERO " + str(self.getK() + 9) + "\n"
         
         # tY = tY + tY
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
 
         # C = C + C
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         
         # JUMP to tX < tY
         self.out += "JUMP " + str(tYtX) + "\n"
         
         # HALF tY
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
         self.out += "HALF\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
         # HALF C
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         self.out += "HALF\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         # tX = tX - tY
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
-        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 4) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 4 + 1000) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 4 + 1000) + "\n"
         # tY = Y
         self.out += "LOAD " + str(p[2]) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
         # W = W + C
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
         # C = 1
         self.out += "SET 1\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         
         # JUMP to tX < Y
         self.out += "JUMP " + str(tXY) + "\n"
         
         # OUT W
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
 
         self.nextFreeIndex += self.tempIndexes
         self.tempIndexes = 0
@@ -408,15 +408,15 @@ class CompParser(Parser):
     
         # tX = X; adr nfi + ti - 3
         self.out += "LOAD " + str(p[0]) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
         # tY = Y; adr nfi + ti - 2
         self.out += "LOAD " + str(p[2]) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
         # C = 1; adr nfi + ti - 1
         self.out += "SET 1\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
     
         # Y = 0?
@@ -426,54 +426,54 @@ class CompParser(Parser):
         # tX < Y?
         tXY = self.getK() + 1
         self.out += "SET 1\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
         self.out += "SUB " + str(p[2]) + "\n"
         self.out += "JZERO " + str(self.getK() + 27) + "\n"
     
         # tY > tX?
         tYtX = self.getK() + 1
         self.out += "SET 1\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
-        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         self.out += "JZERO " + str(self.getK() + 9) + "\n"
     
         # tY = tY + tY
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
     
         # C = C + C
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
-        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
+        self.out += "ADD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
     
         # JUMP to tX < tY
         self.out += "JUMP " + str(tYtX) + "\n"
     
         # HALF tY
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         self.out += "HALF\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         # HALF C
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
         self.out += "HALF\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
         # tX = tX - tY
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
-        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
+        self.out += "SUB " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
         # tY = Y
         self.out += "LOAD " + str(p[2]) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 2 + 1000) + "\n"
         # C = 1
         self.out += "SET 1\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes - 1 + 1000) + "\n"
     
         # JUMP to tX < Y
         self.out += "JUMP " + str(tXY) + "\n"
     
         # OUT tX
-        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3) + "\n"
+        self.out += "LOAD " + str(self.nextFreeIndex + self.tempIndexes - 3 + 1000) + "\n"
 
         self.nextFreeIndex += self.tempIndexes
         self.tempIndexes = 0

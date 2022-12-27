@@ -24,15 +24,32 @@ VAR y
 BEGIN
     y := x%2;
     IF y = 1 THEN
-        x := 10;
+        x := x + 1;
     ENDIF
     add1(x);
 END
 
+PROCEDURE sort(x, y, z) IS
+BEGIN
+    IF x > y THEN
+        swap(x, y);
+    ENDIF
+
+    IF y > z THEN
+        swap(y, z);
+    ENDIF
+
+    IF x > y THEN
+        swap(x, y);
+    ENDIF
+END
+
 PROGRAM IS
-VAR x
+VAR x, y, z
 BEGIN
     READ x;
-    makeOdd(x);
-    WRITE x;
+    READ y;
+    READ z;
+    sort(x, y, z);
+    write3(x, y, z);
 END
