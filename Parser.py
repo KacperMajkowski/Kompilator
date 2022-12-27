@@ -122,11 +122,11 @@ class CompParser(Parser):
     # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
     @_("proc_head semi")
     def command(self, p):
-        self.out += "Procedure " + str(p[0])
+        self.out += "Procedure " + str(p[0]) #+ " "
         self.k_correction += self.getCurrK()
         tempK = self.getCurrK()
         self.out += self.addToIndexesInIf(self.proceduresTable[int(self.getProcedure(p[0])/2)][1], self.k_correction)
-        self.out += "EndProcedure " + str(p[0])
+        self.out += "EndProcedure " + str(p[0]) #+ " "
         command = self.out
         self.k_correction += self.getCurrK() - tempK
         self.out = ""
@@ -564,7 +564,7 @@ class CompParser(Parser):
         for cellIndex in range(len(self.variables)):
             if context == self.variables[cellIndex][0] and x == self.variables[cellIndex][1]:
                 return cellIndex
-        # print(self.variables, context, x, "not found")
+        #print(self.variables, context, x, "not found")
         
     def getProcedure(self, funcName):
         if funcName[-1] == " ":
@@ -711,6 +711,6 @@ if __name__ == '__main__':
     print(" ")
     print(code)
     open("output.txt", 'w').write(code)
-    # print(parser.variables)
-    # print(parser.proceduresTable)
+    print(parser.variables)
+    print(parser.proceduresTable)
     

@@ -14,7 +14,7 @@ class CompLexer(Lexer):
     
     ignore = ' \t'
     ignore_comma = ','
-    ignore_comment = r'\[(.|\n)*\]'
+    ignore_comment = r'\[([^]]|\n)*\]'
 
     @_(r'\n+')
     def newline(self, t):
