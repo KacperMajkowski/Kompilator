@@ -711,6 +711,6 @@ if __name__ == '__main__':
     print(" ")
     print(code)
     open("output.txt", 'w').write(code)
-    print(parser.variables)
-    print(parser.proceduresTable)
+    # print(parser.variables)
+    # print(parser.proceduresTable)
     
