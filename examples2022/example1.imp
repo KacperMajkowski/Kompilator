@@ -1,5 +1,5 @@
 [Równanie diofantyczne mx-ny=nwd(m,n) (z)]
-[PROCEDURE de(m,n,x,y,z) IS
+PROCEDURE de(m,n,x,y,z) IS
 VAR a,b,r,s,reszta,iloraz,rr,ss,tmp
 BEGIN
   a:=m;
@@ -36,7 +36,7 @@ BEGIN
     y:=ss;
   ENDWHILE
   z:=a;
-END]
+END
 
 PROGRAM IS
 VAR m,n,x,y,nwd

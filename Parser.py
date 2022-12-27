@@ -190,7 +190,7 @@ class CompParser(Parser):
         p[3] = self.addToIndexesInIf(p[3], 1)
         
         self.out = p[1] + "JPOS " + str(self.k_correction + 2) + "\n" + p[3] \
-                   + "JUMP " + str(self.k_correction - self.countLines(p[1]) - self.countLines(p[3]) + 1) + "\n"
+                   + "JUMP " + str(self.k_correction - self.countLines(p[1]) - self.countLines(p[3])) + "\n"
         command = self.out
         self.k_correction += 2
         self.out = ""
@@ -215,7 +215,7 @@ class CompParser(Parser):
     @_("num")
     def value(self, p):     #Value zwraca indeks w pamięci
         self.out += "SET " + str(p[0]) + "\n"
-        index = self.nextFreeIndex + self.tempIndexes + 1000*(self.currContext + 1)
+        index = self.nextFreeIndex + self.tempIndexes + 1000
         self.out += "STORE " + str(index) + "\n"
         self.tempIndexes += 1
         return index
@@ -253,24 +253,24 @@ class CompParser(Parser):
         
         # ty = Y
         # adr tY = nfi
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000*(self.currContext + 1)) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
         # Wynik = 0
         # adr Wynik = nfi + 1
         self.out += "SET 0" + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000*(self.currContext + 1)) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
         
         # Counter = 1
         # adr Counter = nfi + 2
         Ceq1 = self.getK() + 1
         self.out += "SET 1" + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000*(self.currContext + 1)) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
         # tX = X
         # adr Counter = nfi + 3
         self.out += "LOAD " + str(p[0]) + "\n"
-        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000*(self.currContext + 1)) + "\n"
+        self.out += "STORE " + str(self.nextFreeIndex + self.tempIndexes + 1000) + "\n"
         self.tempIndexes += 1
         
         # Counter > tY?
