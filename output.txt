@@ -1,1 +1,1 @@
-Blad: Nieznana procedura pb w lini 14
+Blad: Uzycie zainicjalizowanej zmiennej 'b' w lini 14
