@@ -230,7 +230,7 @@ class CompParser(Parser):
     @_("identifier")        #Value zwraca indeks w pamięci
     def value(self, p):
         if not self.variables[self.getVarCellIndex(p[0], self.currContext, p)][3]:
-            self.errormess = "Blad: Uzycie zainicjalizowanej zmiennej '" + p[0] + "' w lini " + str(p.lineno) + "\n"
+            self.errormess = "Blad: Uzycie nie zainicjalizowanej zmiennej '" + p[0] + "' w lini " + str(p.lineno) + "\n"
             self.error(p)
         return str(p[0]) + "<" + str(p.lineno) + ">"
         #return self.getVarCellIndex(p[0], self.currContext)
