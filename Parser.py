@@ -74,11 +74,11 @@ class CompParser(Parser):
         print(self.variables)
         print(p[1])
         print(self.currContext)
-        print(self.getVarCellIndex(p[1], self.currContext))
-        if self.variables[self.getVarCellIndex(p[1], self.currContext)][2] == "og":
-            ret += "SET " + str(self.getVarCellIndex(p[1], self.currContext)) + "\n"
+        print(self.getVarCellIndex(p[1], self.currContext, p))
+        if self.variables[self.getVarCellIndex(p[1], self.currContext, p)][2] == "og":
+            ret += "SET " + str(self.getVarCellIndex(p[1], self.currContext, p)) + "\n"
         else:
-            ret += "LOAD " + str(self.getVarCellIndex(p[1], self.currContext)) + "\n"
+            ret += "LOAD " + str(self.getVarCellIndex(p[1], self.currContext, p)) + "\n"
         ret += "STORE " + "?" + "\n"
         return p[0] + ret
 
@@ -91,11 +91,11 @@ class CompParser(Parser):
         print(self.variables)
         print(p[0])
         print(self.currContext)
-        print(self.getVarCellIndex(p[0], self.currContext))
-        if self.variables[self.getVarCellIndex(p[0], self.currContext)][2] == "og":
-            ret += "SET " + str(self.getVarCellIndex(p[0], self.currContext)) + "\n"
+        print(self.getVarCellIndex(p[0], self.currContext, p))
+        if self.variables[self.getVarCellIndex(p[0], self.currContext, p)][2] == "og":
+            ret += "SET " + str(self.getVarCellIndex(p[0], self.currContext, p)) + "\n"
         else:
-            ret += "LOAD " + str(self.getVarCellIndex(p[0], self.currContext)) + "\n"
+            ret += "LOAD " + str(self.getVarCellIndex(p[0], self.currContext, p)) + "\n"
         ret += "STORE " + "?" + "\n"
         return ret
         
@@ -144,6 +144,9 @@ class CompParser(Parser):
     # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND # COMMAND
     @_("proc_head semi")
     def command(self, p):
+        if self.getProcedure(p[0]) is None:
+            self.errormess = "Blad: Nieznana procedura " + str(p[0]) + " w lini " + str(p.lineno) + "\n"
+            self.error(p)
         self.out += "Procedure " + str(p[0]) #+ " "
         self.k_correction += self.getCurrK()
         tempK = self.getCurrK()
@@ -156,9 +159,9 @@ class CompParser(Parser):
     
     @_("READ identifier semi") # Zwraca swój kod
     def command(self, p):
-        if self.getVarCellIndex(p[1], self.currContext) is None:
+        if self.getVarCellIndex(p[1], self.currContext, p) is None:
             print("Błąd w lini", p.lineno, ": Nie znaleziono zmiennej", p[1])
-        self.out += "GET " + str(p[1]) + ">" + "\n"
+        self.out += "GET " + str(p[1]) + "<" + str(p.lineno) + ">" + "\n"
         command = self.out
         self.k_correction += self.getCurrK()
         self.out = ""
@@ -174,7 +177,7 @@ class CompParser(Parser):
 
     @_("identifier ASSIGN expression semi")  # Zwraca swój kod
     def command(self, p):
-        self.out += "STORE " + str(p[0]) + ">" + "\n"
+        self.out += "STORE " + str(p[0]) + "<" + str(p.lineno)  + ">" + "\n"
         command = self.out
         self.k_correction += self.getCurrK()
         self.out = ""
@@ -231,7 +234,7 @@ class CompParser(Parser):
     # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE # VALUE
     @_("identifier")        #Value zwraca indeks w pamięci
     def value(self, p):
-        return str(p[0]) + ">"
+        return str(p[0]) + "<" + str(p.lineno) + ">"
         #return self.getVarCellIndex(p[0], self.currContext)
 
     @_("num")
@@ -586,11 +589,15 @@ class CompParser(Parser):
         sys.exit()
     
     # Zwraca indeks zmiennej w pamięci
-    def getVarCellIndex(self, x, context):
+    def getVarCellIndex(self, x, context, p):
         for cellIndex in range(len(self.variables)):
             if context == self.variables[cellIndex][0] and x == self.variables[cellIndex][1]:
                 return cellIndex
-        #print(self.variables, context, x, "not found")
+        if type(p) == str:
+            self.errormess = "Blad: Uzycie niezadeklarowanej zmiennej " + x + " w linii " + p + "\n"
+        else:
+            self.errormess = "Blad: Uzycie niezadeklarowanej zmiennej " + x + " w linii " + str(p.lineno) + "\n"
+        self.error(p)
         
     def getProcedure(self, funcName):
         if funcName[-1] == " ":
@@ -640,20 +647,24 @@ class CompParser(Parser):
                     print(commands[commandIndex])
                     print(contextStack)
                     if len(contextStack) > 1 and\
-                            self.variables[self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])][2] == "ref":
+                            self.variables[self.getVarCellIndex(self.splitVar(commands[commandIndex])[0], contextStack[-1],
+                                                                self.splitVar(commands[commandIndex])[1])][2] == "ref":
                         if commands[commandIndex - 1] != "PUT":
                             ret += "I"
-                            commands[commandIndex] = self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])
+                            commands[commandIndex] = self.getVarCellIndex(self.splitVar(commands[commandIndex])[0], contextStack[-1],
+                                                                          self.splitVar(commands[commandIndex])[1])
                         else:
                             ret = ret[:-3]
-                            ret += "LOAD " + str(self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])) + "\n"
+                            ret += "LOAD " + str(self.getVarCellIndex(self.splitVar(commands[commandIndex])[0], contextStack[-1],
+                                                                      self.splitVar(commands[commandIndex])[1])) + "\n"
                             commands[commandIndex] = str(commands[commandIndex - 1]) + " 0\n"
                             
                             commandsStr = self.addToIndexesInIf(commandsStr[commandIndex+1:], 1)
                             commands = commands[:commandIndex] + re.split(r"\n| ", commandsStr)
                     else:
                         print(commands)
-                        commands[commandIndex] = self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])
+                        commands[commandIndex] = self.getVarCellIndex(self.splitVar(commands[commandIndex])[0], contextStack[-1],
+                                                                      self.splitVar(commands[commandIndex])[1])
                 
             if commands[commandIndex] == "Procedure":
                 contextStack.append(self.getProcedure(commands[commandIndex + 1]))
@@ -729,6 +740,9 @@ class CompParser(Parser):
             if var[0] == context and var[1] == name:
                 return True
         return False
+    
+    def splitVar(self, var):
+        return [var[:var.index("<")], var[var.index("<")+1:-1]]
         
   
    

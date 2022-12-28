@@ -1,8 +1,9 @@
-[błąd: druga deklaracja zmiennej c w linii 3]
+[błąd:  użycie nie zadeklarowanej procedury pb w linii 15]
 PROCEDURE pa(a,b) IS
-VAR c,c
+VAR c,d
 BEGIN
   c:=a;
+  d:=b+c;
   a:=c+d;
 END
 
@@ -10,7 +11,6 @@ PROGRAM IS
 VAR a,b
 BEGIN
   READ a;
-  pa(a,b);
+  pb(a,b);
   WRITE b;
 END
-
