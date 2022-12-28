@@ -1,16 +1,9 @@
-[ Binarna postać liczby ]
 PROGRAM IS
-VAR n, p
+VAR x, y
 BEGIN
-    READ n;
-    REPEAT
-	p:=n/2;
-	p:=2*p;
-	IF n>p THEN
-	    WRITE 1;
-	ELSE
-	    WRITE 0;
-	ENDIF
-	n:=n/2;
-    UNTIL n=0;
+    READ x;
+    IF x > 10 THEN
+        y := 6;
+    ENDIF
+    WRITE y;
 END
