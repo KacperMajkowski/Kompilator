@@ -1,13 +1,1 @@
-GET 1
-SET 1
-STORE 1003
-SET 1
-ADD 1003
-SUB 1
-JPOS 11
-SET 1
-STORE 1004
-LOAD 1004
-STORE 2
-PUT 2
-HALT
+Blad: Druga deklaracja zmiennej c w lini 3

@@ -1,9 +1,16 @@
-PROGRAM IS
-VAR x, y
+[błąd: druga deklaracja zmiennej c w linii 3]
+PROCEDURE pa(a,b) IS
+VAR c,c
 BEGIN
-    READ x;
-    IF x > 10 THEN
-        y := 6;
-    ENDIF
-    WRITE y;
+  c:=a;
+  a:=c+d;
 END
+
+PROGRAM IS
+VAR a,b
+BEGIN
+  READ a;
+  pa(a,b);
+  WRITE b;
+END
+

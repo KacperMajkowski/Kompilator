@@ -1,3 +1,5 @@
+import sys
+
 from sly import Parser
 from Lexer import CompLexer
 import re
@@ -15,10 +17,14 @@ class CompParser(Parser):
     variables = [[0, "acc", "og"]]
     procedureDeclarations = []
     proceduresTable = []
+    
+    args = []
 
     out = ""
     program = ""
     k_correction = 0
+    
+    errormess = ""
 
     @_("procedures main")
     def program_all(self, p):
@@ -51,12 +57,18 @@ class CompParser(Parser):
             p[2] = self.replacePointers(p[2], p[0])
             self.out += str(p[2])
         else:
+            for arg in self.args:
+                if self.args.count(arg) > 1:
+                    self.errormess = "Blad: druga deklaracja zmiennej " + str(arg) + " w lini " + str(p.lineno) + "\n"
+                    self.error(p)
+            self.args = []
             self.procedureDeclarations.append(p[0])
         return p[0]
     
     @_("arguments identifier")
     def arguments(self, p):
         self.variables.append([self.nextFreeContext, p[1], "ref"])
+        self.args.append(p[1])
         self.nextFreeIndex += 1
         ret = ""
         print(self.variables)
@@ -73,6 +85,7 @@ class CompParser(Parser):
     @_("identifier")
     def arguments(self, p):
         self.variables.append([self.nextFreeContext, p[0], "ref"])
+        self.args.append(p[0])
         self.nextFreeIndex += 1
         ret = ""
         print(self.variables)
@@ -101,13 +114,22 @@ class CompParser(Parser):
     
     @_("declarations identifier")
     def declarations(self, p):
-        self.variables.append([self.nextFreeContext, p[1], "og"])
+        self.nextFreeIndex = len(self.variables)
+        if not self.variableExists(self.nextFreeContext, p[1], self.variables):
+            self.variables.append([self.nextFreeContext, p[1], "og"])
+        else:
+            self.errormess = "Blad: Druga deklaracja zmiennej " + str(p[1]) + " w lini " + str(p.lineno) + "\n"
+            self.error(p)
         self.nextFreeIndex += 1
         
     @_("identifier")
     def declarations(self, p):
         self.nextFreeIndex = len(self.variables)
-        self.variables.append([self.nextFreeContext, p[0], "og"])
+        if not self.variableExists(self.nextFreeContext, p[0], self.variables):
+            self.variables.append([self.nextFreeContext, p[0], "og"])
+        else:
+            self.errormess = "Blad: Druga deklaracja zmiennej " + str(p[0]) + " w lini " + str(p.lineno) + "\n"
+            self.error(p)
         self.nextFreeIndex += 1
         self.variables[0][0] = self.nextFreeContext
         
@@ -557,7 +579,11 @@ class CompParser(Parser):
     # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION # CONDITION
     
     def error(self, p):
-        print("Error in line", p.lineno)
+        if self.errormess == "":
+            self.errormess = "Error in line " + str(p.lineno)
+        open("output.txt", 'w').write(self.errormess)
+        print(self.errormess)
+        sys.exit()
     
     # Zwraca indeks zmiennej w pamięci
     def getVarCellIndex(self, x, context):
@@ -626,6 +652,7 @@ class CompParser(Parser):
                             commandsStr = self.addToIndexesInIf(commandsStr[commandIndex+1:], 1)
                             commands = commands[:commandIndex] + re.split(r"\n| ", commandsStr)
                     else:
+                        print(commands)
                         commands[commandIndex] = self.getVarCellIndex(commands[commandIndex][:-1], contextStack[-1])
                 
             if commands[commandIndex] == "Procedure":
@@ -696,6 +723,12 @@ class CompParser(Parser):
             for var in variables:
                 var[0] = int(var[0]/2)
         return variables
+    
+    def variableExists(self, context, name, variables):
+        for var in variables:
+            if var[0] == context and var[1] == name:
+                return True
+        return False
         
   
    
