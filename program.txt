@@ -1,17 +1,29 @@
-[błąd:  użycie nie zainicjowanej zmiennej b w linii 13]
-PROCEDURE pa(a,b) IS
-VAR c,d
+[
+  Przyklad / test uzycia zmiennej po przypisaniu
+  Wszystkie przypadki (a, b, c, d) sa semantycznie identycznie
+  i dzialaja w identyczny sposob, przez co *wszystkie* powinny
+  skompilowac sie bez bledow
+]
+
+PROCEDURE test(a) IS
+VAR b, c
 BEGIN
-  c:=a;
-  d:=b+c;
-  b:=c+d;
+  c := 0;
+  WHILE c < 5 DO
+    IF c > 0 THEN
+      b := b + 5;
+    ENDIF
+    IF c = 0 THEN
+      b := 5;
+    ENDIF
+    c := c + 1;
+  ENDWHILE
+  a := b;
 END
 
 PROGRAM IS
-VAR a,b
+VAR a
 BEGIN
-  READ a;
-  WRITE b;
-  pa(a,b);
+  test(a);
+  WRITE a;
 END
-
