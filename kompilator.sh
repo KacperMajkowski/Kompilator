@@ -1,3 +1,4 @@
 #!/bin/bash
 
-python3 Parser.py $1 $2
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+python3 SCRIPT_DIR/Parser.py $1 $2
