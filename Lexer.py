@@ -22,10 +22,10 @@ class CompLexer(Lexer):
     
     num = r'\d+'
     semi = r';'
-    READ = r'READ '
-    WRITE = r'WRITE '
+    READ = r'READ'
+    WRITE = r'WRITE'
     PROGRAM_IS = r'PROGRAM IS'
-    VAR = r'VAR '
+    VAR = r'VAR'
     BEGIN = r'BEGIN'
     ASSIGN = r':='
     PLUS = r'\+'

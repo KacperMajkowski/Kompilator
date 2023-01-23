@@ -1,29 +1,26 @@
-[
-  Przyklad / test uzycia zmiennej po przypisaniu
-  Wszystkie przypadki (a, b, c, d) sa semantycznie identycznie
-  i dzialaja w identyczny sposob, przez co *wszystkie* powinny
-  skompilowac sie bez bledow
+[ Wymnozenie liczby 340282367713220089251654026161790386200
+  ze stalych 33-bitowych
+  ( (2^32+1) * (2^32+2) * (2^32+3) * (2^32+4) )
+  na 2 sposoby.
 ]
-
-PROCEDURE test(a) IS
-VAR b, c
-BEGIN
-  c := 0;
-  WHILE c < 5 DO
-    IF c > 0 THEN
-      b := b + 5;
-    ENDIF
-    IF c = 0 THEN
-      b := 5;
-    ENDIF
-    c := c + 1;
-  ENDWHILE
-  a := b;
-END
-
 PROGRAM IS
-VAR a
+VAR
+    a, b, c, d,
+    n, m
 BEGIN
-  test(a);
-  WRITE a;
+    a := 4294967297;
+    b := 4294967298;
+    c := 4294967299;
+    d := 4294967300;
+
+    n := a * b;
+    n := n * c;
+    n := n * d;
+    WRITE n;
+
+    n := a * d;
+    m := b * c;
+    n := n * m;
+    WRITE n;
+
 END
